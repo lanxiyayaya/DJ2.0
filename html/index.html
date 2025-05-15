@@ -1,11 +1,90 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>数据新闻 | DJ2.0</title>
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- 引入 Scrollama -->
+    <script src="https://unpkg.com/intersection-observer@0.5.1/intersection-observer.js"></script>
+    <script src="https://unpkg.com/scrollama@3.0.1/build/scrollama.min.js"></script>
+    <!-- 可选: 引入D3.js用于数据可视化 -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <script src="js\visualizations\chart.js"></script>
 </head>
 <body>
-    
+    <main>
+        <!-- 导航栏 -->
+        <nav>
+            <div class="nav-container">
+                <div class="logo">DJ2.0</div>
+                <div class="menu">
+                    <a href="#intro">首页</a>
+                    <a href="#stories">故事</a>
+                    <a href="#about">关于</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 头部横幅 -->
+        <header id="intro">
+            <div class="header-container">
+                <h1>数据新闻</h1>
+                <p class="subtitle">探索数据背后的故事</p>
+                <div class="scroll-hint">向下滚动探索</div>
+            </div>
+        </header>
+
+        <!-- 滚动内容部分 -->
+        <section id="scrolly">
+            <div class="sticky-thing">
+                <!-- 这里放置会粘在视窗中的可视化元素 -->
+                <div id="visualization">
+                    <p>数据可视化将显示在这里</p>
+                </div>
+            </div>
+
+            <article>
+                <!-- 步骤 1 -->
+                <div class="step" data-step="1">
+                    <p>这是第一个数据故事段落。在这里，您可以介绍您的数据新闻主题。当用户滚动到这里时，可视化会相应更新。</p>
+                </div>
+                
+                <!-- 步骤 2 -->
+                <div class="step" data-step="2">
+                    <p>随着读者继续滚动，您可以揭示更多数据见解。这个段落将触发可视化的第二个状态。</p>
+                </div>
+                
+                <!-- 步骤 3 -->
+                <div class="step" data-step="3">
+                    <p>第三个部分可以显示更深入的分析或者数据的另一个方面。可视化会随之更新，向读者展示新的数据视角。</p>
+                </div>
+                
+                <!-- 步骤 4 -->
+                <div class="step" data-step="4">
+                    <p>在最后一部分，您可以总结主要发现并提出结论。这是您故事的高潮部分。</p>
+                </div>
+            </article>
+        </section>
+
+        <!-- 下一个故事部分 -->
+        <section id="another-story">
+            <h2>另一个数据故事</h2>
+            <p>您可以添加多个数据故事章节，每个都有自己的滚动体验和数据可视化。</p>
+        </section>
+
+        <!-- 页脚 -->
+        <footer id="about">
+            <div class="footer-container">
+                <h2>关于我们</h2>
+                <p>我们致力于通过数据讲述有意义的故事。</p>
+                <p>&copy; 2025 DJ2.0 - 数据新闻</p>
+            </div>
+        </footer>
+    </main>
+
+    <script src="js/main.js"></script>
 </body>
 </html>
