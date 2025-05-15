@@ -1,0 +1,33 @@
+/* 
+   filepath: d:\一堆破事夹\乱七八糟\Data_Journalism\DJ2\DJ2.0\css\title-page-integrated.css
+   集成页面所需的额外样式
+*/
+
+/* 主内容区域初始状态设置 */
+#main-content {
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+
+/* 标题页转场动画相关样式 */
+#title-page {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    transition: opacity 1s ease;
+}
+
+/* 当标题页隐藏时，确保其完全不可见且不占用空间 */
+#title-page.hidden {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+}
+
+/* 主内容在标题页可见时应该隐藏 */
+body.title-visible #main-content {
+    display: none;
+}

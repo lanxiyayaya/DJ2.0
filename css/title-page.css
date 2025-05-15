@@ -72,7 +72,7 @@ body {
 
 .authors p {
     font-size: 1.2rem;
-    color: #555;
+    color: #b0b0b0;
     margin: 0;
     line-height: 1.6;
 }
@@ -90,15 +90,15 @@ body {
 
 .continue-hint p {
     font-size: 0.9rem;
-    color: #777;
+    color: #8f8f8f;
     margin-bottom: 10px;
 }
 
 .arrow-down {
     width: 20px;
     height: 20px;
-    border-right: 2px solid #777;
-    border-bottom: 2px solid #777;
+    border-right: 2px solid #1e90ff;
+    border-bottom: 2px solid #1e90ff;
     transform: rotate(45deg);
     margin: 0 auto;
     animation: bounce 2s infinite;

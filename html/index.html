@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>数据新闻 | DJ2.0</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <title>博士生的"延"不由衷 | 数据新闻</title>    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/title-page.css">
+    <link rel="stylesheet" href="../css/title-page-integrated.css">
 
     <!-- 引入 Scrollama -->
     <script src="https://unpkg.com/intersection-observer@0.5.1/intersection-observer.js"></script>
@@ -13,7 +14,22 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 <body>
-    <main>
+    <!-- 标题页 -->
+    <div id="title-page" class="title-container">
+        <div class="typing-container">
+            <h1 id="typing-title"></h1>
+            <div class="cursor"></div>
+        </div>
+        <div class="authors" id="authors">
+            <p>郭梓铮 刘祎涵 管诗雨 郭中丹 贾舒然</p>
+        </div>
+        <div class="continue-hint" id="continue-hint">
+            <p>向下滚动继续阅读</p>
+            <div class="arrow-down"></div>
+        </div>
+    </div>
+    
+    <main id="main-content" style="display: none;">
         <!-- 导航栏 -->
         <nav>
             <div class="nav-container">
@@ -81,9 +97,8 @@
                 <p>&copy; 2025 DJ2.0 - 数据新闻</p>
             </div>
         </footer>
-    </main>
-
-    <!-- 修复脚本路径 -->
+    </main>    <!-- 脚本引用 -->
+    <script src="../js/typing-effect.js"></script>
     <script src="../js/main.js"></script>
     <script src="../js/visualizations/chart.js"></script>
 </body>
