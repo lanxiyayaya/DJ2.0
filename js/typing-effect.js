@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     // 标题文本 - 正确处理引号和特殊字符
-    const titleText = '"我们破茧而并非成蝶"：博士生的"延"不由衷';
+    const titleText = "“我们破茧而并非成蝶”：博士生的“延”不由衷";
     const titleElement = document.getElementById('typing-title');
     const authorsElement = document.getElementById('authors');
     const continueHintElement = document.getElementById('continue-hint');
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
             let typingSpeed = 150;
             
             // 如果是当前字符是标点符号，则下一个字符前停顿时间长一些
-            if ('，。：、""《》？！'.includes(currentChar)) {
+            if ('，。：、“”《》？！'.includes(currentChar)) {
                 typingSpeed = 400;
             }
             
