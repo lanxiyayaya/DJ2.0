@@ -3,8 +3,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // 初始化数据
     let newsData = null;
     
-    // 加载数据
-    fetch('data/news_data.json')
+    // 加载数据 - 修复数据文件路径
+    fetch('../data/news_data.json')
         .then(response => response.json())
         .then(data => {
             newsData = data;

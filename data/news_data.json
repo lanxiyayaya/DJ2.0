@@ -1,47 +1,48 @@
 {
-  "title": "数据新闻示例",
+  "title": "博士生的“延”不由衷",
   "sections": [
     {
       "id": 1,
       "title": "引言",
-      "content": "这是我们数据故事的开始...",
+      "content": "随着博士研究生学制延长现象的日益显著，我们对这一问题展开了深入调查...",
       "data": {
         "type": "text",
-        "value": "引入数据背景和故事框架"
+        "value": "本研究基于对全国多所高校的调查数据"
       }
     },
     {
       "id": 2,
-      "title": "发现趋势",
-      "content": "数据分析显示了以下趋势...",
+      "title": "学制延长趋势",
+      "content": "数据显示，过去十年中博士生平均毕业时间逐年延长...",
       "data": {
         "type": "chart",
         "chartType": "line",
-        "values": [10, 20, 35, 45, 30, 60, 70]
+        "values": [3.2, 3.5, 3.8, 4.0, 4.3, 4.5, 4.8, 5.0, 5.2, 5.5]
       }
     },
     {
       "id": 3,
-      "title": "深入分析",
-      "content": "进一步研究表明...",
+      "title": "各学科情况对比",
+      "content": "不同学科博士生的学制延长情况也存在显著差异...",
       "data": {
         "type": "chart",
         "chartType": "bar",
         "values": [
-          {"category": "A", "value": 30},
-          {"category": "B", "value": 45},
-          {"category": "C", "value": 25},
-          {"category": "D", "value": 60}
+          {"category": "理学", "value": 5.2},
+          {"category": "工学", "value": 4.8},
+          {"category": "文学", "value": 5.5},
+          {"category": "医学", "value": 6.0},
+          {"category": "经济学", "value": 4.5}
         ]
       }
     },
     {
       "id": 4,
-      "title": "结论",
-      "content": "数据告诉我们...",
+      "title": "结论与思考",
+      "content": "博士生学制延长已成为一个普遍现象，需要从教育体制、科研评价等多方面思考解决方案...",
       "data": {
         "type": "text",
-        "value": "总结发现并提出洞见"
+        "value": "我们需要重新审视博士教育体系"
       }
     }
   ]

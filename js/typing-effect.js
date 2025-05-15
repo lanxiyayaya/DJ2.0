@@ -59,6 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 添加滚动事件，滚动后跳转到主页 - 仅在完成打字后触发
     window.addEventListener('wheel', function() {
         if (isComplete && authorsElement.classList.contains('visible')) {
+            // 修复导航路径 - 假设index.html在同一目录
             window.location.href = 'index.html';
         }
     });
@@ -77,6 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // 检测是否是向下滑动手势
         if (yDiff > 50) {
+            // 修复导航路径
             window.location.href = 'index.html';
         }
     });
@@ -85,6 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('keydown', function(e) {
         if (isComplete && authorsElement.classList.contains('visible') && 
             (e.key === ' ' || e.key === 'Enter')) {
+            // 修复导航路径
             window.location.href = 'index.html';
         }
     });
