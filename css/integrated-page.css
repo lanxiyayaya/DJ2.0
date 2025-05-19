@@ -77,7 +77,7 @@ body {
 
 /* 调整段落间距，使体验更连贯 */
 .step {
-    margin-bottom: 60vh; /* 减少原来的80vh间距 */
+    margin-top: 50vh; /* 减少原来的80vh间距 */
 }
 
 .step:last-child {
