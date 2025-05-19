@@ -1,0 +1,85 @@
+/* 基本布局设置 */
+html {
+    scroll-behavior: smooth; /* 启用平滑滚动 */
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+/* 使内容容器铺满并正确定位 */
+.full-content {
+    width: 100%;
+    position: relative;
+}
+
+/* 确保每个全高度部分至少占满一个屏幕 */
+.full-height {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 导航栏样式调整 */
+#main-nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: rgba(18, 18, 18, 0.95);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    transform: translateY(-100%); /* 初始隐藏导航栏 */
+    transition: transform 0.4s ease;
+}
+
+#main-nav.visible {
+    transform: translateY(0); /* 显示导航栏 */
+}
+
+/* 适应标题页的导航栏特殊样式 */
+#main-nav.at-title-section {
+    background-color: rgba(18, 18, 18, 0.5); /* 更透明 */
+}
+
+/* 标题部分的特殊调整 */
+#title-section {
+    position: relative; /* 不再是fixed */
+    height: 100vh;
+    width: 100%;
+    background-color: #121212;
+}
+
+/* 当标题文字完成时添加微妙的动画提示 */
+#title-section.typing-completed .continue-hint {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
+}
+
+/* 活动导航项样式 */
+.menu a.active {
+    color: #1e90ff;
+    border-bottom: 2px solid #1e90ff;
+}
+
+/* 防止滚动内容部分的间隔过大 */
+#scrolly {
+    padding-top: 60px; /* 为导航栏腾出空间 */
+}
+
+/* 调整段落间距，使体验更连贯 */
+.step {
+    margin-bottom: 60vh; /* 减少原来的80vh间距 */
+}
+
+.step:last-child {
+    margin-bottom: 20vh; /* 最后一个步骤间距更小 */
+}
