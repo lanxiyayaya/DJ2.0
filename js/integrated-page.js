@@ -203,8 +203,8 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // 获取当前激活的step元素来检查它是否有自己的内容
             const activeStep = document.querySelector('.step.is-active');
-            const hasHtmlContent = activeStep && activeStep.innerHTML.trim().length > 0 && 
-                                 !activeStep.innerHTML.includes('<!-- 从JSON加载内容 -->');
+            // 检查step元素是否有实际内容（不只是注释）
+            const hasHtmlContent = activeStep && activeStep.querySelector('p, h1, h2, h3, h4, h5, h6');
             
             // 清空之前的内容
             viz.innerHTML = '';

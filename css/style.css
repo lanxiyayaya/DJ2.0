@@ -129,6 +129,8 @@ h1 {
     color: #e0e0e0;
     transition: all 0.5s ease;
     position: relative;
+    background-size: cover;
+    background-position: center;
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
@@ -138,13 +140,14 @@ h1 {
 /* 内容覆盖层样式 */
 .content-overlay {
     padding: 30px;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.8);
     border-radius: 12px;
     max-width: 80%;
     text-align: center;
     animation: fadeIn 0.7s ease;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     margin: 20px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 @keyframes fadeIn {
@@ -184,6 +187,13 @@ article {
     font-size: 1.2rem;
     line-height: 1.8;
     color: #e0e0e0;
+}
+
+.step h2 {
+    font-size: 1.8rem;
+    color: #1e90ff;
+    margin-bottom: 15px;
+    text-align: center;
 }
 
 .step.is-active {
