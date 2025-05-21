@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const titleSection = document.getElementById('title-section');
     
     // ===== 标题页打字效果 =====
-    const titleText = "“我们破茧而并非成蝶”：博士生的“延”不由衷";
+    const titleText = ""我们破茧而并非成蝶"：博士生的"延"不由衷";
     const titleElement = document.getElementById('typing-title');
     const authorsElement = document.getElementById('authors');
     const continueHintElement = document.getElementById('continue-hint');

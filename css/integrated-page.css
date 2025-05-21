@@ -72,12 +72,12 @@ body {
 
 /* 防止滚动内容部分的间隔过大 */
 #scrolly {
-    padding-top: 60px; /* 为导航栏腾出空间 */
+    padding-top: 0; /* 移除顶部间距 */
 }
 
 /* 调整段落间距，使体验更连贯 */
 .step {
-    margin-top: 50vh; /* 减少原来的80vh间距 */
+    margin-top: 100vh; /* 增加步骤之间的间距 */
 }
 
 .step:last-child {

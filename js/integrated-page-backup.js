@@ -1,15 +1,14 @@
-﻿// filepath: d:\一堆破事夹\乱七八糟\Data_Journalism\DJ2\DJ2.0\js\integrated-page.js
-// 集成页面的主要JavaScript
+﻿// 闆嗘垚椤甸潰鐨勪富瑕丣avaScript
 
 document.addEventListener('DOMContentLoaded', function() {
-    // ===== 全局变量 =====
+    // ===== 鍏ㄥ眬鍙橀噺 =====
     let newsData = null;
     let isTypingComplete = false;
     const nav = document.getElementById('main-nav');
     const titleSection = document.getElementById('title-section');
     
-    // ===== 标题页打字效果 =====
-    const titleText = "“我们破茧而并非成蝶”：博士生的“延”不由衷";
+    // ===== 鏍囬椤垫墦瀛楁晥鏋?=====
+    const titleText = "鈥滄垜浠牬鑼ц€屽苟闈炴垚铦垛€濓細鍗氬＋鐢熺殑鈥滃欢鈥濅笉鐢辫》";
     const titleElement = document.getElementById('typing-title');
     const authorsElement = document.getElementById('authors');
     const continueHintElement = document.getElementById('continue-hint');
@@ -17,46 +16,46 @@ document.addEventListener('DOMContentLoaded', function() {
     
     let charIndex = 0;
     
-    // 打字效果函数
+    // 鎵撳瓧鏁堟灉鍑芥暟
     function typeTitle() {
         if (charIndex < titleText.length) {
-            // 获取当前字符
+            // 鑾峰彇褰撳墠瀛楃
             const currentChar = titleText.charAt(charIndex);
             
-            // 添加字符到标题
+            // 娣诲姞瀛楃鍒版爣棰?
             titleElement.innerHTML += currentChar;
             charIndex++;
             
-            // 调整光标位置
+            // 璋冩暣鍏夋爣浣嶇疆
             setTimeout(() => {
                 cursor.style.left = (titleElement.offsetWidth) + 'px';
                 cursor.style.right = 'auto';
             }, 0);
             
-            // 根据当前字符调整打字速度
+            // 鏍规嵁褰撳墠瀛楃璋冩暣鎵撳瓧閫熷害
             let typingSpeed = 150;
-            if ('，。：、""《》？！'.includes(currentChar)) {
+            if ('锛屻€傦細銆?"銆娿€嬶紵锛?.includes(currentChar)) {
                 typingSpeed = 400;
             }
             
             setTimeout(typeTitle, typingSpeed);
         } else {
-            // 打字完成后
+            // 鎵撳瓧瀹屾垚鍚?
             isTypingComplete = true;
             titleSection.classList.add('typing-completed');
             
-            // 确保光标位置正确
+            // 纭繚鍏夋爣浣嶇疆姝ｇ‘
             cursor.style.left = (titleElement.offsetWidth) + 'px';
             
-            // 显示作者信息
+            // 鏄剧ず浣滆€呬俊鎭?
             setTimeout(() => {
                 authorsElement.classList.add('visible');
                 
-                // 显示继续阅读提示
+                // 鏄剧ず缁х画闃呰鎻愮ず
                 setTimeout(() => {
                     continueHintElement.classList.add('visible');
                     
-                    // 打字效果完成后显示导航栏
+                    // 鎵撳瓧鏁堟灉瀹屾垚鍚庢樉绀哄鑸爮
                     setTimeout(() => {
                         nav.classList.add('visible');
                     }, 1000);
@@ -65,26 +64,26 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // ===== 滚动效果处理 =====
+    // ===== 婊氬姩鏁堟灉澶勭悊 =====
     
-    // 监听滚动事件，控制导航栏显示/隐藏
+    // 鐩戝惉婊氬姩浜嬩欢锛屾帶鍒跺鑸爮鏄剧ず/闅愯棌
     let lastScrollY = 0;
     let ticking = false;
     
     function handleScroll() {
         const currentScrollY = window.scrollY;
         
-        // 当不在页面顶部时显示导航栏
+        // 褰撲笉鍦ㄩ〉闈㈤《閮ㄦ椂鏄剧ず瀵艰埅鏍?
         if (currentScrollY > 100 && isTypingComplete) {
             nav.classList.add('visible');
         } else if (currentScrollY <= 100 && !isTypingComplete) {
             nav.classList.remove('visible');
         }
         
-        // 检查当前在哪个部分，更新活动导航项
+        // 妫€鏌ュ綋鍓嶅湪鍝釜閮ㄥ垎锛屾洿鏂版椿鍔ㄥ鑸」
         updateActiveNavItem();
         
-        // 标记已处理此滚动事件
+        // 鏍囪宸插鐞嗘婊氬姩浜嬩欢
         ticking = false;
         lastScrollY = currentScrollY;
     }
@@ -96,11 +95,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // 更新当前活动导航项
+    // 鏇存柊褰撳墠娲诲姩瀵艰埅椤?
     function updateActiveNavItem() {
         const scrollPosition = window.scrollY + window.innerHeight / 2;
         
-        // 获取所有部分
+        // 鑾峰彇鎵€鏈夐儴鍒?
         const sections = [
             document.getElementById('title-section'),
             document.getElementById('intro'),
@@ -108,13 +107,13 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('about')
         ];
         
-        // 获取所有导航链接
+        // 鑾峰彇鎵€鏈夊鑸摼鎺?
         const navLinks = document.querySelectorAll('.menu a');
         
-        // 移除所有活动类
+        // 绉婚櫎鎵€鏈夋椿鍔ㄧ被
         navLinks.forEach(link => link.classList.remove('active'));
         
-        // 检查当前滚动位置在哪个部分
+        // 妫€鏌ュ綋鍓嶆粴鍔ㄤ綅缃湪鍝釜閮ㄥ垎
         let currentSectionIndex = 0;
         for (let i = 0; i < sections.length; i++) {
             const section = sections[i];
@@ -129,20 +128,20 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        // 标题区域特殊处理导航栏背景
+        // 鏍囬鍖哄煙鐗规畩澶勭悊瀵艰埅鏍忚儗鏅?
         if (currentSectionIndex === 0) {
             nav.classList.add('at-title-section');
         } else {
             nav.classList.remove('at-title-section');
         }
         
-        // 激活对应的导航链接
+        // 婵€娲诲搴旂殑瀵艰埅閾炬帴
         navLinks[currentSectionIndex].classList.add('active');
     }
     
-    // ===== 数据加载与可视化 =====
+    // ===== 鏁版嵁鍔犺浇涓庡彲瑙嗗寲 =====
     
-    // 加载数据
+    // 鍔犺浇鏁版嵁
     fetch('../data/news_data.json')
         .then(response => response.json())
         .then(data => {
@@ -153,13 +152,13 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error loading data:', error);
             document.getElementById('visualization').innerHTML = `
                 <div class="error">
-                    <h3>数据加载错误</h3>
-                    <p>无法加载数据文件。请检查您的数据路径。</p>
+                    <h3>鏁版嵁鍔犺浇閿欒</h3>
+                    <p>鏃犳硶鍔犺浇鏁版嵁鏂囦欢銆傝妫€鏌ユ偍鐨勬暟鎹矾寰勩€?/p>
                 </div>
             `;
         });
     
-    // 初始化滚动讲故事功能
+    // 鍒濆鍖栨粴鍔ㄨ鏁呬簨鍔熻兘
     function initScrollytelling() {
         const scroller = scrollama();
         
@@ -172,26 +171,25 @@ document.addEventListener('DOMContentLoaded', function() {
             .onStepEnter(handleStepEnter)
             .onStepExit(handleStepExit);
         
-        // 响应窗口调整大小
+        // 鍝嶅簲绐楀彛璋冩暣澶у皬
         window.addEventListener('resize', scroller.resize);
         
-        // 处理进入步骤的函数
+        // 澶勭悊杩涘叆姝ラ鐨勫嚱鏁?
         function handleStepEnter(response) {
-            // 添加激活类
+            // 娣诲姞婵€娲荤被
             response.element.classList.add('is-active');
             
-            // 根据不同的步骤更新可视化
+            // 鏍规嵁涓嶅悓鐨勬楠ゆ洿鏂板彲瑙嗗寲
             updateVisualization(response.index);
         }
         
-        // 处理退出步骤的函数
+        // 澶勭悊閫€鍑烘楠ょ殑鍑芥暟
         function handleStepExit(response) {
-            // 移除激活类
+            // 绉婚櫎婵€娲荤被
             response.element.classList.remove('is-active');
         }
         
-        // 更新可视化函数
-        function updateVisualization(stepIndex) {
+        // 鏇存柊鍙鍖栧嚱鏁?       function updateVisualization(stepIndex) {
             const viz = document.getElementById('visualization');
             
             if (!newsData || !newsData.sections || stepIndex >= newsData.sections.length) {
@@ -201,21 +199,20 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const section = newsData.sections[stepIndex];
             
-            // 获取当前激活的step元素来检查它是否有自己的内容
+            // 鑾峰彇褰撳墠婵€娲荤殑step鍏冪礌鏉ユ鏌ュ畠鏄惁鏈夎嚜宸辩殑鍐呭
             const activeStep = document.querySelector('.step.is-active');
-            const hasHtmlContent = activeStep && activeStep.innerHTML.trim().length > 0 && 
-                                 !activeStep.innerHTML.includes('<!-- 从JSON加载内容 -->');
+            const hasHtmlContent = activeStep && activeStep.innerHTML.trim().length > 0;
             
-            // 清空之前的内容
+            // 娓呯┖涔嬪墠鐨勫唴瀹?
             viz.innerHTML = '';
             
-            // 根据数据类型选择可视化
+            // 鏍规嵁鏁版嵁绫诲瀷閫夋嫨鍙鍖?
             if (section.data.type === 'chart') {
-                // 图表类型
+                // 鍥捐〃绫诲瀷
                 viz.style.backgroundImage = '';
                 viz.style.backgroundColor = '#2a2a2a';
                 
-                // 添加标题
+                // 娣诲姞鏍囬
                 const titleEl = document.createElement('h3');
                 titleEl.textContent = section.title;
                 viz.appendChild(titleEl);
@@ -224,17 +221,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 chartContainer.className = 'chart-container';
                 viz.appendChild(chartContainer);
                 
-                // 如果已经加载了chart.js文件，使用其中的函数
+                // 濡傛灉宸茬粡鍔犺浇浜哻hart.js鏂囦欢锛屼娇鐢ㄥ叾涓殑鍑芥暟
                 if (section.data.chartType === 'line' && typeof createLineChart === 'function') {
                     createLineChart(chartContainer, section.data.values);
                 } else if (section.data.chartType === 'bar' && typeof createBarChart === 'function') {
                     createBarChart(chartContainer, section.data.values);
                 } else {
-                    chartContainer.innerHTML = `<p>图表类型: ${section.data.chartType}</p>
-                        <p>数据值: ${JSON.stringify(section.data.values)}</p>`;
+                    chartContainer.innerHTML = `<p>鍥捐〃绫诲瀷: ${section.data.chartType}</p>
+                        <p>鏁版嵁鍊? ${JSON.stringify(section.data.values)}</p>`;
                 }
                 
-                // 只有当HTML步骤中没有内容时，才添加JSON中的内容
+                // 鍙湁褰揌TML姝ラ涓病鏈夊唴瀹规椂锛屾墠娣诲姞JSON涓殑鍐呭
                 if (!hasHtmlContent) {
                     const contentSection = document.createElement('div');
                     contentSection.className = 'content-section';
@@ -242,14 +239,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     viz.appendChild(contentSection);
                 }
             } else if (section.data.type === 'image') {
-                // 图片类型 - 设置为背景图片
+                // 鍥剧墖绫诲瀷 - 璁剧疆涓鸿儗鏅浘鐗?
                 viz.style.backgroundImage = `url('${section.data.value}')`;
                 viz.style.backgroundSize = 'contain';
                 viz.style.backgroundPosition = 'center';
                 viz.style.backgroundRepeat = 'no-repeat';
                 viz.style.backgroundColor = 'transparent';
                 
-                // 只有当HTML步骤中没有内容时，才添加JSON中的内容覆盖层
+                // 鍙湁褰揌TML姝ラ涓病鏈夊唴瀹规椂锛屾墠娣诲姞JSON涓殑鍐呭瑕嗙洊灞?
                 if (!hasHtmlContent) {
                     const contentOverlay = document.createElement('div');
                     contentOverlay.className = 'content-overlay';
@@ -257,22 +254,22 @@ document.addEventListener('DOMContentLoaded', function() {
                     viz.appendChild(contentOverlay);
                 }
             } else {
-                // 文本类型数据
+                // 鏂囨湰绫诲瀷鏁版嵁
                 viz.style.backgroundImage = '';
                 viz.style.backgroundColor = '#2a2a2a';
                 
-                // 添加标题
+                // 娣诲姞鏍囬
                 const titleEl = document.createElement('h3');
                 titleEl.textContent = section.title;
                 viz.appendChild(titleEl);
                 
-                // 添加文本内容
+                // 娣诲姞鏂囨湰鍐呭
                 const textContent = document.createElement('div');
                 textContent.className = 'text-content';
                 textContent.textContent = section.data.value;
                 viz.appendChild(textContent);
                 
-                // 只有当HTML步骤中没有内容时，才添加JSON中的内容
+                // 鍙湁褰揌TML姝ラ涓病鏈夊唴瀹规椂锛屾墠娣诲姞JSON涓殑鍐呭
                 if (!hasHtmlContent) {
                     const contentSection = document.createElement('div');
                     contentSection.className = 'content-section';
@@ -280,12 +277,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     viz.appendChild(contentSection);
                 }
             }
-        }
-    }
+        }    }
     
-    // ===== 平滑导航 =====
-    
-    // 平滑滚动导航
+    // ===== 骞虫粦瀵艰埅 =====
+    // 骞虫粦婊氬姩瀵艰埅
     document.querySelectorAll('.menu a').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
             e.preventDefault();
@@ -294,7 +289,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const targetElement = document.querySelector(targetId);
             
             if (targetElement) {
-                // 计算目标位置，考虑导航栏高度
+                // 璁＄畻鐩爣浣嶇疆锛岃€冭檻瀵艰埅鏍忛珮搴?
                 const navHeight = nav.offsetHeight;
                 const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY - navHeight;
                 
@@ -303,14 +298,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     behavior: 'smooth'
                 });
                 
-                // 更新URL但不影响滚动位置
+                // 鏇存柊URL浣嗕笉褰卞搷婊氬姩浣嶇疆
                 history.pushState(null, null, targetId);
             }
         });
     });
     
-    // ===== 初始化 =====
+    // ===== 鍒濆鍖?=====
     
-    // 稍微延迟后开始打字效果
+    // 绋嶅井寤惰繜鍚庡紑濮嬫墦瀛楁晥鏋?
     setTimeout(typeTitle, 1000);
 });
