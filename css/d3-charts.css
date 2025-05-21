@@ -1,0 +1,108 @@
+/* D3 图表样式 */
+.d3-chart-container {
+    width: 100%;
+    height: 500px;
+    margin: 20px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.d3-chart-container svg {
+    max-width: 100%;
+    overflow: visible;
+}
+
+/* 横向条形图样式 */
+.awarded-bar {
+    opacity: 0.9;
+    transition: opacity 0.3s;
+}
+
+.awarded-bar:hover {
+    opacity: 1;
+    filter: brightness(1.2);
+}
+
+.delayed-bar {
+    opacity: 0.9;
+    transition: opacity 0.3s;
+}
+
+.delayed-bar:hover {
+    opacity: 1;
+    filter: brightness(1.2);
+}
+
+/* 柱状图样式 */
+.bar-chart rect {
+    transition: filter 0.3s;
+}
+
+.bar-chart rect:hover {
+    filter: brightness(1.2);
+}
+
+/* 图例样式 */
+.chart-legend text {
+    font-size: 14px;
+    font-family: sans-serif;
+}
+
+/* 数据标签样式 */
+.value-label, .rate-label {
+    font-weight: 500;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* 轴标签样式 */
+.axis-label {
+    font-size: 14px;
+    font-weight: 500;
+    fill: #e0e0e0;
+}
+
+/* 网格线样式 */
+.grid line {
+    stroke: rgba(255, 255, 255, 0.1);
+    shape-rendering: crispEdges;
+}
+
+.grid path {
+    stroke-width: 0;
+}
+
+/* 提示框样式 */
+.tooltip {
+    border-radius: 5px;
+    animation: fadeIn 0.2s ease-out;
+    border-left: 4px solid #FFC107;
+    max-width: 260px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 响应式样式 */
+@media (max-width: 768px) {
+    .d3-chart-container {
+        height: 400px;
+    }
+    
+    .d3-chart-container svg {
+        max-width: 100%;
+        height: auto;
+    }
+    
+    .value-label, .rate-label {
+        font-size: 10px !important;
+    }
+}

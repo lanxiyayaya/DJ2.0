@@ -143,9 +143,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // ===== 数据加载与可视化 =====
     
     // 加载数据
+    console.log('正在尝试加载数据文件...');
     fetch('../data/news_data.json')
-        .then(response => response.json())
+        .then(response => {
+            console.log('数据加载响应状态:', response.status);
+            return response.json();
+        })
         .then(data => {
+            console.log('数据已加载，包含', data.sections.length, '个部分');
             newsData = data;
             initScrollytelling();
         })
@@ -161,6 +166,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 初始化滚动讲故事功能
     function initScrollytelling() {
+        console.log('初始化滚动讲故事功能...');
+        const steps = document.querySelectorAll('#scrolly .step');
+        console.log('找到', steps.length, '个滚动步骤');
+        
         const scroller = scrollama();
         
         scroller
@@ -192,10 +201,17 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // 更新可视化函数
         function updateVisualization(stepIndex) {
+            console.log('更新可视化，步骤索引:', stepIndex);
+            
             const viz = document.getElementById('visualization');
             
             if (!newsData || !newsData.sections || stepIndex >= newsData.sections.length) {
                 viz.innerHTML = '<p>No data available for this step</p>';
+                console.error('没有可用的数据，或步骤索引超出范围', {
+                    hasNewsData: !!newsData,
+                    sectionsLength: newsData ? newsData.sections.length : 0,
+                    requestedIndex: stepIndex
+                });
                 return;
             }
             
@@ -255,6 +271,44 @@ document.addEventListener('DOMContentLoaded', function() {
                     contentOverlay.className = 'content-overlay';
                     contentOverlay.innerHTML = section.content;
                     viz.appendChild(contentOverlay);
+                }
+            } else if (section.data.type === 'd3Chart') {
+                // D3.js 可视化图表
+                console.log('处理 D3 图表, 类型:', section.data.chartType);
+                viz.style.backgroundImage = '';
+                viz.style.backgroundColor = '#2a2a2a';
+                
+                // 添加标题
+                const titleEl = document.createElement('h3');
+                titleEl.textContent = section.title;
+                viz.appendChild(titleEl);
+                
+                // 创建图表容器
+                const d3ChartContainer = document.createElement('div');
+                d3ChartContainer.className = 'd3-chart-container';
+                d3ChartContainer.id = `d3-chart-${stepIndex}`;
+                viz.appendChild(d3ChartContainer);
+                
+                try {
+                    // 基于图表类型渲染不同的D3图表
+                    if (section.data.chartType === 'barChart') {
+                        console.log('创建柱状图，数据年份:', section.data.years, '数据值:', section.data.values);
+                        createD3BarChart(d3ChartContainer.id, section.data.years, section.data.values);
+                    } else if (section.data.chartType === 'horizontalBarChart') {
+                        console.log('创建横向条形图，年份:', section.data.years);
+                        createD3HorizontalBarChart(d3ChartContainer.id, section.data.years, section.data.degreeAwarded, section.data.delayedGraduation);
+                    }
+                } catch (chartError) {
+                    console.error('创建图表时出错:', chartError);
+                    d3ChartContainer.innerHTML = `<div class="chart-error">创建图表时出错: ${chartError.message}</div>`;
+                }
+                
+                // 只有当HTML步骤中没有内容时，才添加JSON中的内容
+                if (!hasHtmlContent) {
+                    const contentSection = document.createElement('div');
+                    contentSection.className = 'content-section';
+                    contentSection.innerHTML = section.content;
+                    viz.appendChild(contentSection);
                 }
             } else {
                 // 文本类型数据
