@@ -1,8 +1,3 @@
-﻿// filepat    // ===== 标题页打字效果 =====
-    const titleText = "“我们破茧而并非成蝶”：博士生的“延”不由衷";
-    const titleElement = document.getElementById('typing-title');
-    const authorsElement = document.getElementById('authors');
-    const cursor = document.querySelector('.cursor');一堆破事夹\乱七八糟\Data_Journalism\DJ2\DJ2.0\js\integrated-page.js
 // 集成页面的主要JavaScript
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -16,7 +11,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const titleText = "“我们破茧而并非成蝶”：博士生的“延”不由衷";
     const titleElement = document.getElementById('typing-title');
     const authorsElement = document.getElementById('authors');
-    const continueHintElement = document.getElementById('continue-hint');
     const cursor = document.querySelector('.cursor');
     
     let charIndex = 0;
@@ -98,54 +92,31 @@ document.addEventListener('DOMContentLoaded', function() {
     // 更新当前活动导航项
     function updateActiveNavItem() {
         const scrollPosition = window.scrollY + window.innerHeight / 2;
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('nav .menu a');
         
-        // 获取所有部分
-        const sections = [
-            document.getElementById('title-section'),
-            document.getElementById('intro'),
-            document.getElementById('scrolly'),
-            document.getElementById('about')
-        ];
-        
-        // 获取所有导航链接
-        const navLinks = document.querySelectorAll('.menu a');
-        
-        // 移除所有活动类
-        navLinks.forEach(link => link.classList.remove('active'));
-        
-        // 检查当前滚动位置在哪个部分
-        let currentSectionIndex = 0;
-        for (let i = 0; i < sections.length; i++) {
-            const section = sections[i];
-            if (!section) continue;
-            
+        sections.forEach((section, i) => {
             const sectionTop = section.offsetTop;
             const sectionBottom = sectionTop + section.offsetHeight;
             
             if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
-                currentSectionIndex = i;
-                break;
+                navLinks.forEach(link => link.classList.remove('active'));
+                navLinks[i].classList.add('active');
             }
-        }
-        
-        // 标题区域特殊处理导航栏背景
-        if (currentSectionIndex === 0) {
-            nav.classList.add('at-title-section');
-        } else {
-            nav.classList.remove('at-title-section');
-        }
-        
-        // 激活对应的导航链接
-        navLinks[currentSectionIndex].classList.add('active');
+        });
     }
     
-    // ===== 数据加载与可视化 =====
+    // ===== 加载数据并初始化滚动讲故事 =====
     
-    // 加载数据
-    console.log('正在尝试加载数据文件...');
+    // 启动打字效果
+    setTimeout(typeTitle, 500);
+    
+    // 加载JSON数据
     fetch('../data/news_data.json')
         .then(response => {
-            console.log('数据加载响应状态:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             return response.json();
         })
         .then(data => {
@@ -197,8 +168,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // 移除激活类
             response.element.classList.remove('is-active');
         }
-        
-        // 更新可视化函数
+          // 更新可视化函数
         function updateVisualization(stepIndex) {
             console.log('更新可视化，步骤索引:', stepIndex);
             
@@ -218,12 +188,11 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // 获取当前激活的step元素来检查它是否有自己的内容
             const activeStep = document.querySelector('.step.is-active');
-            // 检查step元素是否有实际内容（不只是注释）
-            const hasHtmlContent = activeStep && activeStep.querySelector('p, h1, h2, h3, h4, h5, h6');
             
             // 清空之前的内容
             viz.innerHTML = '';
             
+            // 只加载可视化数据，不重复添加文本内容
             // 根据数据类型选择可视化
             if (section.data.type === 'chart') {
                 // 图表类型
@@ -248,122 +217,91 @@ document.addEventListener('DOMContentLoaded', function() {
                     chartContainer.innerHTML = `<p>图表类型: ${section.data.chartType}</p>
                         <p>数据值: ${JSON.stringify(section.data.values)}</p>`;
                 }
-                
-                // 只有当HTML步骤中没有内容时，才添加JSON中的内容
-                if (!hasHtmlContent) {
-                    const contentSection = document.createElement('div');
-                    contentSection.className = 'content-section';
-                    contentSection.innerHTML = section.content;
-                    viz.appendChild(contentSection);
-                }
-            } else if (section.data.type === 'image') {
-                // 图片类型 - 设置为背景图片
-                viz.style.backgroundImage = `url('${section.data.value}')`;
-                viz.style.backgroundSize = 'contain';
-                viz.style.backgroundPosition = 'center';
-                viz.style.backgroundRepeat = 'no-repeat';
-                viz.style.backgroundColor = 'transparent';
-                
-                // 只有当HTML步骤中没有内容时，才添加JSON中的内容覆盖层
-                if (!hasHtmlContent) {
-                    const contentOverlay = document.createElement('div');
-                    contentOverlay.className = 'content-overlay';
-                    contentOverlay.innerHTML = section.content;
-                    viz.appendChild(contentOverlay);
-                }
             } else if (section.data.type === 'd3Chart') {
-                // D3.js 可视化图表
-                console.log('处理 D3 图表, 类型:', section.data.chartType);
+                // D3.js 图表
                 viz.style.backgroundImage = '';
                 viz.style.backgroundColor = '#2a2a2a';
-                
-                // 添加标题
-                const titleEl = document.createElement('h3');
-                titleEl.textContent = section.title;
-                viz.appendChild(titleEl);
                 
                 // 创建图表容器
-                const d3ChartContainer = document.createElement('div');
-                d3ChartContainer.className = 'd3-chart-container';
-                d3ChartContainer.id = `d3-chart-${stepIndex}`;
-                viz.appendChild(d3ChartContainer);
-                
-                try {
-                    // 基于图表类型渲染不同的D3图表
-                    if (section.data.chartType === 'barChart') {
-                        console.log('创建柱状图，数据年份:', section.data.years, '数据值:', section.data.values);
-                        createD3BarChart(d3ChartContainer.id, section.data.years, section.data.values);
-                    } else if (section.data.chartType === 'horizontalBarChart') {
-                        console.log('创建横向条形图，年份:', section.data.years);
-                        createD3HorizontalBarChart(d3ChartContainer.id, section.data.years, section.data.degreeAwarded, section.data.delayedGraduation);
-                    }
-                } catch (chartError) {
-                    console.error('创建图表时出错:', chartError);
-                    d3ChartContainer.innerHTML = `<div class="chart-error">创建图表时出错: ${chartError.message}</div>`;
-                }
-                
-                // 只有当HTML步骤中没有内容时，才添加JSON中的内容
-                if (!hasHtmlContent) {
-                    const contentSection = document.createElement('div');
-                    contentSection.className = 'content-section';
-                    contentSection.innerHTML = section.content;
-                    viz.appendChild(contentSection);
-                }
-            } else {
-                // 文本类型数据
-                viz.style.backgroundImage = '';
-                viz.style.backgroundColor = '#2a2a2a';
+                const chartContainer = document.createElement('div');
+                chartContainer.className = 'd3-chart-container';
+                chartContainer.id = `d3-chart-${stepIndex}`;
+                viz.appendChild(chartContainer);
                 
                 // 添加标题
                 const titleEl = document.createElement('h3');
+                titleEl.className = 'chart-title';
                 titleEl.textContent = section.title;
                 viz.appendChild(titleEl);
                 
-                // 添加文本内容
-                const textContent = document.createElement('div');
-                textContent.className = 'text-content';
-                textContent.textContent = section.data.value;
-                viz.appendChild(textContent);
+                console.log('创建D3图表:', section.data.chartType);
                 
-                // 只有当HTML步骤中没有内容时，才添加JSON中的内容
-                if (!hasHtmlContent) {
-                    const contentSection = document.createElement('div');
-                    contentSection.className = 'content-section';
-                    contentSection.innerHTML = section.content;
-                    viz.appendChild(contentSection);
+                // 根据图表类型创建不同的D3图表
+                try {
+                    if (section.data.chartType === 'barChart' && typeof createD3BarChart === 'function') {
+                        createD3BarChart(chartContainer.id, section.data.years, section.data.values);
+                    } else if (section.data.chartType === 'horizontalBarChart' && typeof createD3HorizontalBarChart === 'function') {
+                        createD3HorizontalBarChart(chartContainer.id, section.data.years, 
+                            section.data.degreeAwarded, section.data.delayedGraduation);
+                    } else {
+                        chartContainer.innerHTML = `<p>未知的D3图表类型: ${section.data.chartType}</p>`;
+                    }
+                } catch (error) {
+                    console.error('创建图表时出错:', error);
+                    chartContainer.innerHTML = `<p>创建图表时出错: ${error.message}</p>`;
+                }            } else if (section.data.type === 'image') {
+                // 图像类型 - 只显示图片背景，不显示文本内容
+                viz.style.backgroundImage = `url(${section.data.value})`;
+                viz.style.backgroundColor = 'transparent';
+            } else if (section.data.type === 'text') {
+                // 纯文本类型
+                viz.style.backgroundImage = '';
+                viz.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+                
+                const textContainer = document.createElement('div');
+                textContainer.className = 'text-container';
+                
+                // 添加标题
+                const titleEl = document.createElement('h2');
+                titleEl.textContent = section.title;
+                textContainer.appendChild(titleEl);
+                
+                // 添加内容
+                const contentEl = document.createElement('div');
+                contentEl.innerHTML = section.content;
+                textContainer.appendChild(contentEl);
+                
+                // 添加值
+                if (section.data.value) {
+                    const valueEl = document.createElement('p');
+                    valueEl.className = 'highlight';
+                    valueEl.textContent = section.data.value;
+                    textContainer.appendChild(valueEl);
                 }
+                
+                viz.appendChild(textContainer);
+            } else {
+                // 默认情况
+                viz.style.backgroundImage = '';
+                viz.style.backgroundColor = '#333';
+                
+                const defaultContent = document.createElement('div');
+                defaultContent.className = 'default-content';
+                
+                // 标题
+                const title = document.createElement('h3');
+                title.textContent = section.title || 'Section Title';
+                defaultContent.appendChild(title);
+                
+                // 内容
+                if (section.content) {
+                    const content = document.createElement('div');
+                    content.innerHTML = section.content;
+                    defaultContent.appendChild(content);
+                }
+                
+                viz.appendChild(defaultContent);
             }
         }
     }
-    
-    // ===== 平滑导航 =====
-    
-    // 平滑滚动导航
-    document.querySelectorAll('.menu a').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            const targetId = this.getAttribute('href');
-            const targetElement = document.querySelector(targetId);
-            
-            if (targetElement) {
-                // 计算目标位置，考虑导航栏高度
-                const navHeight = nav.offsetHeight;
-                const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY - navHeight;
-                
-                window.scrollTo({
-                    top: targetPosition,
-                    behavior: 'smooth'
-                });
-                
-                // 更新URL但不影响滚动位置
-                history.pushState(null, null, targetId);
-            }
-        });
-    });
-    
-    // ===== 初始化 =====
-    
-    // 稍微延迟后开始打字效果
-    setTimeout(typeTitle, 1000);
 });

@@ -7,7 +7,7 @@ function createD3BarChart(containerId, years, values) {
     
     // 图表尺寸和边距
     const margin = {top: 30, right: 30, bottom: 70, left: 80};
-    const width = 800 - margin.left - margin.right;
+    const width = 1000 - margin.left - margin.right;
     const height = 400 - margin.top - margin.bottom;
     
     // 创建SVG元素
@@ -22,7 +22,7 @@ function createD3BarChart(containerId, years, values) {
     const x = d3.scaleBand()
         .domain(years)
         .range([0, width])
-        .padding(0.2);
+        .padding(0.3);
         
     // Y轴比例尺
     const y = d3.scaleLinear()
@@ -81,7 +81,7 @@ function createD3BarChart(containerId, years, values) {
     const colorScale = d3.scaleLinear()
         .domain([0, values.length - 1])
         .range(['#5e9cd3', '#1e5484']);
-          // 添加柱状图
+      // 添加柱状图
     svg.selectAll('rect')
         .data(values)
         .enter()
@@ -92,24 +92,8 @@ function createD3BarChart(containerId, years, values) {
         .attr('height', 0)  // 初始高度为0
         .attr('fill', (d, i) => colorScale(i))
         .attr('rx', 3)  // 圆角
-        .attr('ry', 3)
-        .attr('stroke', (d, i) => {
-            // 为最大和最小值添加特殊边框
-            if (d === d3.max(values)) return '#FFC107';
-            if (d === d3.min(values)) return '#4caf50';
-            return 'none';
-        })
-        .attr('stroke-width', (d) => {
-            // 为最大和最小值添加边框宽度
-            if (d === d3.max(values) || d === d3.min(values)) return 2;
-            return 0;
-        })
-        .attr('stroke-dasharray', (d) => {
-            // 为最大和最小值添加虚线边框
-            if (d === d3.max(values) || d === d3.min(values)) return '3,2';
-            return 'none';
-        });
-          // 添加数值标签
+        .attr('ry', 3);
+      // 添加数值标签
     svg.selectAll('.value-label')
         .data(values)
         .enter()
@@ -118,22 +102,9 @@ function createD3BarChart(containerId, years, values) {
         .attr('x', (d, i) => x(years[i]) + x.bandwidth() / 2)
         .attr('y', d => y(d) - 10)
         .attr('text-anchor', 'middle')
-        .style('font-size', (d) => {
-            // 为最大和最小值使用更大的字体
-            if (d === d3.max(values) || d === d3.min(values)) return '13px';
-            return '12px';
-        })
-        .style('font-weight', (d) => {
-            // 为最大和最小值使用加粗字体
-            if (d === d3.max(values) || d === d3.min(values)) return '700';
-            return '400';
-        })
-        .style('fill', (d) => {
-            // 为最大和最小值使用特殊颜色
-            if (d === d3.max(values)) return '#FFC107';
-            if (d === d3.min(values)) return '#4caf50';
-            return '#e0e0e0';
-        })
+        .style('font-size', '12px')
+        .style('font-weight', '400')
+        .style('fill', '#e0e0e0')
         .style('opacity', 0)  // 初始透明
         .text(d => d3.format(',')(d));
         
@@ -143,9 +114,7 @@ function createD3BarChart(containerId, years, values) {
         .attr('y', -10)
         .attr('text-anchor', 'middle')
         .style('font-size', '16px')
-        .style('fill', '#e0e0e0')
-
-      // 添加动画效果
+        .style('fill', '#e0e0e0')    // 添加动画效果
     svg.selectAll('rect')
         .transition()
         .duration(800)
@@ -159,78 +128,34 @@ function createD3BarChart(containerId, years, values) {
                     .transition()
                     .duration(500)
                     .style('opacity', 1);
-                    
-                // 为最大和最小值添加特殊标记
-                const maxValue = d3.max(values);
-                const minValue = d3.min(values);
-                const maxIndex = values.indexOf(maxValue);
-                const minIndex = values.indexOf(minValue);
-                
-                // 添加最大值标记
-                svg.append('text')
-                    .attr('class', 'max-indicator')
-                    .attr('x', x(years[maxIndex]) + x.bandwidth() / 2)
-                    .attr('y', y(maxValue) - 20)
-                    .attr('text-anchor', 'middle')
-                    .style('font-size', '12px')
-                    .style('font-weight', '700')
-                    .style('fill', '#FFC107')
-                    .text('峰值')
-                    .style('opacity', 0)
-                    .transition()
-                    .duration(500)
-                    .style('opacity', 1);
-                
-                // 添加最小值标记
-                svg.append('text')
-                    .attr('class', 'min-indicator')
-                    .attr('x', x(years[minIndex]) + x.bandwidth() / 2)
-                    .attr('y', y(minValue) - 20)
-                    .attr('text-anchor', 'middle')
-                    .style('font-size', '12px')
-                    .style('font-weight', '700')
-                    .style('fill', '#4caf50')
-                    .text('低点')
-                    .style('opacity', 0)
-                    .transition()
-                    .duration(500)
-                    .style('opacity', 1);
-                    
-                // 计算整体增长趋势
-                const firstValue = values[0];
-                const lastValue = values[values.length - 1];
-                const growthPercentage = ((lastValue - firstValue) / firstValue * 100).toFixed(1);
-                
-                // 添加总体增长趋势标签
-                svg.append('text')
-                    .attr('class', 'growth-trend')
-                    .attr('x', width / 2)
-                    .attr('y', 20)
-                    .attr('text-anchor', 'middle')
-                    .style('font-size', '14px')
-                    .style('font-weight', '500')
-                    .style('fill', '#e0e0e0')
-                    .html(`近二十年招生总体增长: <tspan style="fill: #4caf50; font-weight: 700">${growthPercentage}%</tspan>`)
-                    .style('opacity', 0)
-                    .transition()
-                    .duration(800)
-                    .delay(500)
-                    .style('opacity', 1);
             }
         });
-          // 添加交互效果 - 鼠标悬停
-    svg.selectAll('rect')
-        .on('mouseover', function(event, d) {
-            // 获取当前柱状图的索引
-            const index = values.indexOf(d);
-            const year = years[index];
-            
-            // 高亮当前柱状图
-            d3.select(this)
-                .transition()
-                .duration(200)
-                .attr('fill', '#FFC107')
-                .attr('opacity', 1);
+    
+    // 添加交互效果 - 鼠标悬停
+    const barRects = svg.selectAll('rect');
+    barRects.on('mouseover', function(event, d, i) {
+        // 获取当前柱状图的索引
+        const thisRect = d3.select(this);
+        const rectData = thisRect.data()[0];
+        const index = values.findIndex(v => v === rectData);
+        const year = years[index];
+        
+        // 确定是否是特殊年份
+        const specialYears = ["2004年", "2021年", "2022年"];
+        const isSpecialYear = specialYears.includes(year);
+        
+        // 高亮当前柱状图，除了特殊年份不变色
+        thisRect
+            .transition()
+            .duration(200)
+            .attr('fill', isSpecialYear ? colorScale(index) : '#FFC107')
+            .attr('opacity', 1);
+        
+        // 使其他柱状图变暗
+        barRects.filter(function() { return this !== event.currentTarget; })
+            .transition()
+            .duration(200)
+            .attr('opacity', 0.5);
                 
             // 显示对应的数值标签
             svg.selectAll('.value-label')
@@ -292,13 +217,9 @@ function createD3BarChart(containerId, years, values) {
                     <div>招生人数: <strong>${d3.format(',')(d)}</strong> 人</div>
                     ${growthInfo}
                 `);
-        })
-        .on('mouseout', function() {
-            // 获取当前柱状图的索引
-            const index = values.indexOf(d3.select(this).datum());
-            
-            // 恢复柱状图原样式
-            d3.select(this)
+        })        .on('mouseout', function() {
+            // 恢复所有柱状图原样式
+            svg.selectAll('rect')
                 .transition()
                 .duration(200)
                 .attr('fill', (d, i) => colorScale(i))
@@ -354,6 +275,15 @@ function createD3HorizontalBarChart(containerId, years, degreeAwarded, delayedGr
             isMin: isMin
         };
     });
+      // 缩放比例
+    const x = d3.scaleLinear()
+        .domain([0, d3.max(degreeAwarded) * 1.1])
+        .range([0, width]);
+        
+    const y = d3.scaleBand()
+        .domain(years)
+        .range([0, height])
+        .padding(0.3);
     
     // 为每组创建一个分组
     years.forEach((year, i) => {
@@ -375,16 +305,6 @@ function createD3HorizontalBarChart(containerId, years, degreeAwarded, delayedGr
         .attr('fill', (d, i) => i % 2 === 0 ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.03)')
         .attr('rx', 2)
         .attr('ry', 2);
-    
-    // 缩放比例
-    const x = d3.scaleLinear()
-        .domain([0, d3.max(degreeAwarded) * 1.1])
-        .range([0, width]);
-        
-    const y = d3.scaleBand()
-        .domain(years)
-        .range([0, height])
-        .padding(0.3);
           // 添加Y轴 (年份)
     svg.append('g')
         .call(d3.axisLeft(y))

@@ -140,10 +140,5 @@
     .value-label, .rate-label {
         font-size: 10px !important;
     }
-        height: auto;
-    }
-    
-    .value-label, .rate-label {
-        font-size: 10px !important;
-    }
+}
 
