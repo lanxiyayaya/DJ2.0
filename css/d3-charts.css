@@ -60,6 +60,7 @@
     font-size: 14px;
     font-weight: 500;
     fill: #e0e0e0;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 /* 网格线样式 */
@@ -70,6 +71,29 @@
 
 .grid path {
     stroke-width: 0;
+}
+
+/* 最大值和最小值指示器样式 */
+.max-indicator, .min-indicator, .growth-trend, .rate-indicator {
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    animation: pulse 2s infinite ease-in-out;
+}
+
+/* 脉冲动画效果 */
+@keyframes pulse {
+    0% { opacity: 0.7; }
+    50% { opacity: 1; }
+    100% { opacity: 0.7; }
+}
+
+/* 背景条纹样式 */
+.background-stripe {
+    opacity: 0.5;
+    transition: opacity 0.3s;
+}
+
+.background-stripe:hover {
+    opacity: 0.8;
 }
 
 /* 提示框样式 */
@@ -95,14 +119,31 @@
 @media (max-width: 768px) {
     .d3-chart-container {
         height: 400px;
+        margin: 10px auto;
     }
     
     .d3-chart-container svg {
         max-width: 100%;
+        height: auto;
+        overflow-x: auto;
+    }
+    
+    .tooltip {
+        max-width: 200px;
+        font-size: 12px !important;
+    }
+    
+    .axis-label {
+        font-size: 12px !important;
+    }
+    
+    .value-label, .rate-label {
+        font-size: 10px !important;
+    }
         height: auto;
     }
     
     .value-label, .rate-label {
         font-size: 10px !important;
     }
-}
+
