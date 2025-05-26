@@ -2,7 +2,7 @@
     const titleText = "“我们破茧而并非成蝶”：博士生的“延”不由衷";
     const titleElement = document.getElementById('typing-title');
     const authorsElement = document.getElementById('authors');
-    const cursor = document.querySelector('.cursor');一堆破事夹\乱七八糟\Data_Journalism\DJ2\DJ2.0\js\integrated-page.js
+    const cursor = document.querySelector('.cursor');
 // 集成页面的主要JavaScript
 
 document.addEventListener('DOMContentLoaded', function() {

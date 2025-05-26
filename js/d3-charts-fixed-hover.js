@@ -1,12 +1,17 @@
-// D3.js 图表函数
+// D3.js 图表函数 - 修复版本 (专门解决悬停效果问题)
 
 // 创建博士生招生数据柱状图
 function createD3BarChart(containerId, years, values) {
+    console.log("创建柱状图 - 悬停效果修复版本");
+    console.log("容器ID:", containerId);
+    console.log("年份数据:", years);
+    console.log("数值数据:", values);
+    
     // 清空容器
     d3.select(`#${containerId}`).html('');
     
     // 图表尺寸和边距
-    const margin = {top: 30, right: 30, bottom: 70, left: 80};
+    const margin = {top: 50, right: 30, bottom: 70, left: 80};
     const width = 1000 - margin.left - margin.right;
     const height = 400 - margin.top - margin.bottom;
     
@@ -18,6 +23,16 @@ function createD3BarChart(containerId, years, values) {
         .append('g')
         .attr('transform', `translate(${margin.left},${margin.top})`);
         
+    // 添加标题
+    svg.append('text')
+        .attr('x', width / 2)
+        .attr('y', -20)
+        .attr('text-anchor', 'middle')
+        .style('font-size', '16px')
+        .style('font-weight', 'bold')
+        .style('fill', '#e0e0e0')
+        .text('我国博士生招生人数（2004年至2022年）');
+    
     // X轴比例尺
     const x = d3.scaleBand()
         .domain(years)
@@ -28,7 +43,8 @@ function createD3BarChart(containerId, years, values) {
     const y = d3.scaleLinear()
         .domain([0, d3.max(values) * 1.1])
         .range([height, 0]);
-          // 添加X轴
+        
+    // 添加X轴
     svg.append('g')
         .attr('transform', `translate(0,${height})`)
         .call(d3.axisBottom(x))
@@ -80,120 +96,140 @@ function createD3BarChart(containerId, years, values) {
     // 定义颜色渐变
     const colorScale = d3.scaleLinear()
         .domain([0, values.length - 1])
-        .range(['#5e9cd3', '#1e5484']);      // 添加柱状图
-    svg.selectAll('rect')
-        .data(values)
+        .range(['#5e9cd3', '#1e5484']);
+    
+    // 为数据创建映射，以确保能够正确匹配年份和值
+    const dataArray = years.map((year, i) => {
+        return {
+            year: year,
+            value: values[i],
+            index: i
+        };
+    });
+    
+    console.log("处理的数据:", dataArray);
+    
+    // 添加柱状图 - 修复：确保每个bar都有正确的数据绑定
+    const bars = svg.selectAll('.bar')
+        .data(dataArray)
         .enter()
         .append('rect')
-        .attr('x', (d, i) => x(years[i]))
-        .attr('y', height)  // 从底部开始动画
+        .attr('class', 'bar')
+        .attr('x', d => x(d.year))
+        .attr('y', height) // 初始位置在底部
         .attr('width', x.bandwidth())
-        .attr('height', 0)  // 初始高度为0
-        .attr('fill', (d, i) => colorScale(i))
-        .attr('data-index', (d, i) => i)  // 设置data-index属性以便追踪索引
-        .attr('rx', 3)  // 圆角
-        .attr('ry', 3);
-      // 添加数值标签
-    svg.selectAll('.value-label')
-        .data(values)
+        .attr('height', 0) // 初始高度为0
+        .attr('fill', d => colorScale(d.index))
+        .attr('rx', 3) // 圆角
+        .attr('ry', 3)
+        .style('cursor', 'pointer'); // 添加指针样式，表明可交互
+    
+    // 添加数值标签
+    const valueLabels = svg.selectAll('.value-label')
+        .data(dataArray)
         .enter()
         .append('text')
         .attr('class', 'value-label')
-        .attr('x', (d, i) => x(years[i]) + x.bandwidth() / 2)
-        .attr('y', d => y(d) - 10)
+        .attr('x', d => x(d.year) + x.bandwidth() / 2)
+        .attr('y', d => y(d.value) - 10)
         .attr('text-anchor', 'middle')
         .style('font-size', '12px')
         .style('font-weight', '400')
         .style('fill', '#e0e0e0')
-        .style('opacity', 0)  // 初始透明
-        .text(d => d3.format(',')(d));
-          // 添加标题
-    svg.append('text')
-        .attr('x', width / 2)
-        .attr('y', -10)
-        .attr('text-anchor', 'middle')
-        .style('font-size', '16px')
-        .style('font-weight', 'bold')
-        .style('fill', '#e0e0e0')
-        .text('我国博士生招生人数（2004年至2022年）');    // 添加动画效果
-    svg.selectAll('rect')
-        .transition()
+        .style('opacity', 0) // 初始不可见
+        .text(d => d3.format(',')(d.value));
+    
+    // 添加动画效果
+    bars.transition()
         .duration(800)
         .delay((d, i) => i * 100)
-        .attr('y', d => y(d))
-        .attr('height', d => height - y(d))
+        .attr('y', d => y(d.value))
+        .attr('height', d => height - y(d.value))
         .on('end', function(d, i) {
-            // 柱状图动画完成后显示数值标签
-            if (i === values.length - 1) {
-                svg.selectAll('.value-label')
-                    .transition()
+            // 最后一个柱状图动画完成后显示所有数值标签
+            if (i === dataArray.length - 1) {
+                valueLabels.transition()
                     .duration(500)
                     .style('opacity', 1);
             }
         });
-      // 添加交互效果 - 鼠标悬停
-    const barRects = svg.selectAll('rect');
-    barRects.on('mouseover', function(event, d) {
-        // 获取当前柱状图的索引和年份
-        const thisRect = d3.select(this);
-        const index = thisRect.attr('data-index');
-        const year = years[index];
+    
+    // 创建透明的交互区域，确保整个柱子区域都可以响应鼠标事件
+    const hitAreas = svg.selectAll('.hit-area')
+        .data(dataArray)
+        .enter()
+        .append('rect')
+        .attr('class', 'hit-area')
+        .attr('x', d => x(d.year))
+        .attr('y', 0)
+        .attr('width', x.bandwidth())
+        .attr('height', height)
+        .attr('fill', 'transparent')
+        .style('cursor', 'pointer');
+    
+    // 添加交互效果 - 鼠标悬停（同时监听柱子和透明交互区域）
+    const handleMouseOver = function(event, d) {
+        console.log("鼠标悬停在:", d.year, "值:", d.value);
         
-        // 统一的高亮效果：所有柱状图在悬停时都变亮
-        thisRect
+        // 高亮当前柱状图
+        svg.selectAll('.bar')
+            .filter(data => data.year === d.year)
             .transition()
             .duration(200)
-            .attr('fill', '#4a9ff8')  // 统一使用亮蓝色高亮
+            .attr('fill', '#4a9ff8') // 统一的高亮颜色
             .attr('opacity', 1)
-            .attr('filter', 'brightness(1.3)'); // 提高亮度
-          // 使其他柱状图变暗
-        barRects.filter(function() { return this !== event.currentTarget; })
+            .style('filter', 'brightness(1.3)'); // 增加亮度
+        
+        // 其他柱状图变暗
+        svg.selectAll('.bar')
+            .filter(data => data.year !== d.year)
             .transition()
             .duration(200)
             .attr('opacity', 0.5);
         
-        // 显示对应的数值标签
-        svg.selectAll('.value-label')
-            .filter((_, i) => i == index)  // 使用== 而不是=== 来适应字符串和数字比较
+        // 高亮当前数值标签
+        valueLabels.filter(data => data.year === d.year)
             .transition()
             .duration(200)
             .style('font-size', '14px')
             .style('font-weight', '700')
             .style('fill', '#ffffff');
-                
-            // 创建和定位提示框
-            const tooltip = d3.select(`#${containerId}`)
-                .append('div')
-                .attr('class', 'tooltip')
-                .style('position', 'absolute')
-                .style('background-color', 'rgba(20, 20, 20, 0.9)')
-                .style('color', '#fff')
-                .style('padding', '10px 15px')
-                .style('border-radius', '6px')
-                .style('font-size', '14px')
-                .style('box-shadow', '0 2px 10px rgba(0,0,0,0.5)')
-                .style('border-left', '4px solid #FFC107')
-                .style('z-index', '1000')
-                .style('pointer-events', 'none');
-                  // 计算提示框位置
+        
+        // 移除已有的提示框
+        d3.select(`#${containerId}`).selectAll('.tooltip').remove();
+        
+        // 创建和定位提示框
+        const tooltip = d3.select(`#${containerId}`)
+            .append('div')
+            .attr('class', 'tooltip')
+            .style('position', 'absolute')
+            .style('background-color', 'rgba(20, 20, 20, 0.9)')
+            .style('color', '#fff')
+            .style('padding', '10px 15px')
+            .style('border-radius', '6px')
+            .style('font-size', '14px')
+            .style('box-shadow', '0 2px 10px rgba(0,0,0,0.5)')
+            .style('border-left', '4px solid #4a9ff8')
+            .style('z-index', '1000')
+            .style('pointer-events', 'none');
+        
+        // 计算提示框位置
         const containerRect = d3.select(`#${containerId}`).node().getBoundingClientRect();
         const tooltipX = event.pageX - containerRect.left + 10;
         const tooltipY = event.pageY - containerRect.top - 60;
         
         // 如果是最近几年，将提示框移至左侧以避免超出屏幕
-        const isRecentYear = index > years.length - 4;
+        const isRecentYear = d.index > years.length - 4;
         const adjustedX = isRecentYear ? tooltipX - 200 : tooltipX;
-        
-        // 获取当前值
-        const value = values[index];
         
         // 计算增长率（对于非第一年）
         let growthInfo = '';
-        if (index > 0) {
-            const prevValue = values[index - 1];
-            const growth = value - prevValue;
+        if (d.index > 0) {
+            const prevValue = values[d.index - 1];
+            const growth = d.value - prevValue;
             const growthRate = ((growth / prevValue) * 100).toFixed(1);
             const growthColor = growth >= 0 ? '#4caf50' : '#f44336';
+            
             growthInfo = `
                 <div style="margin-top: 5px;">
                     <span>较上年: </span>
@@ -201,42 +237,55 @@ function createD3BarChart(containerId, years, values) {
                         ${growth >= 0 ? '+' : ''}${d3.format(',')(growth)} (${growth >= 0 ? '+' : ''}${growthRate}%)
                     </strong>
                 </div>`;
-            }
-              // 设置提示框位置和内容
-            tooltip
-                .style('left', `${adjustedX}px`)
-                .style('top', `${tooltipY}px`)
-                .html(`
-                    <div style="border-bottom: 1px solid rgba(255,255,255,0.2); margin-bottom: 8px; padding-bottom: 5px;">
-                        <strong style="font-size: 16px;">${year}</strong>
-                    </div>
-                    <div>招生人数: <strong>${d3.format(',')(value)}</strong> 人</div>
-                    ${growthInfo}
-                `);
-        })        .on('mouseout', function() {
-            // 恢复所有柱状图原样式
-            svg.selectAll('rect')
-                .transition()
-                .duration(200)
-                .attr('fill', (d, i) => colorScale(i))
-                .attr('opacity', 0.9)
-                .attr('filter', 'none');  // 移除亮度滤镜
-            
-            // 恢复数值标签样式
-            svg.selectAll('.value-label')
-                .transition()
-                .duration(200)
-                .style('font-size', '12px')
-                .style('font-weight', '400')
-                .style('fill', '#e0e0e0');
-                
-            // 移除提示框
-            d3.select(`#${containerId}`).selectAll('.tooltip').remove();
-        });
+        }
+        
+        // 设置提示框位置和内容
+        tooltip
+            .style('left', `${adjustedX}px`)
+            .style('top', `${tooltipY}px`)
+            .html(`
+                <div style="border-bottom: 1px solid rgba(255,255,255,0.2); margin-bottom: 8px; padding-bottom: 5px;">
+                    <strong style="font-size: 16px;">${d.year}</strong>
+                </div>
+                <div>招生人数: <strong>${d3.format(',')(d.value)}</strong> 人</div>
+                ${growthInfo}
+            `);
+    };
+    
+    const handleMouseOut = function(event, d) {
+        console.log("鼠标离开:", d.year);
+        
+        // 恢复所有柱状图原样式
+        svg.selectAll('.bar')
+            .transition()
+            .duration(200)
+            .attr('fill', d => colorScale(d.index))
+            .attr('opacity', 1)
+            .style('filter', 'none'); // 移除亮度滤镜
+        
+        // 恢复所有数值标签样式
+        valueLabels.transition()
+            .duration(200)
+            .style('font-size', '12px')
+            .style('font-weight', '400')
+            .style('fill', '#e0e0e0');
+        
+        // 移除提示框
+        d3.select(`#${containerId}`).selectAll('.tooltip').remove();
+    };
+    
+    // 同时为柱子和透明交互区域添加事件监听
+    bars.on('mouseover', handleMouseOver)
+        .on('mouseout', handleMouseOut);
+        
+    hitAreas.on('mouseover', handleMouseOver)
+        .on('mouseout', handleMouseOut);
 }
 
 // 创建博士生延毕数据横向条形图
 function createD3HorizontalBarChart(containerId, years, degreeAwarded, delayedGraduation) {
+    // 原有代码保持不变...
+    // 这个函数可以从d3-charts-complete.js中复制过来
     // 清空容器
     d3.select(`#${containerId}`).html('');
     
@@ -252,7 +301,8 @@ function createD3HorizontalBarChart(containerId, years, degreeAwarded, delayedGr
         .attr('height', height + margin.top + margin.bottom)
         .append('g')
         .attr('transform', `translate(${margin.left},${margin.top})`);
-          // 数据处理 - 计算延毕比例与高亮基准
+    
+    // 数据处理 - 计算延毕比例与高亮基准
     const delayRates = years.map((year, i) => {
         // 计算延毕率
         const rate = (delayedGraduation[i] / degreeAwarded[i] * 100).toFixed(1);
@@ -272,7 +322,8 @@ function createD3HorizontalBarChart(containerId, years, degreeAwarded, delayedGr
             isMin: isMin
         };
     });
-      // 缩放比例
+    
+    // 缩放比例
     const x = d3.scaleLinear()
         .domain([0, d3.max(degreeAwarded) * 1.1])
         .range([0, width]);
@@ -302,7 +353,8 @@ function createD3HorizontalBarChart(containerId, years, degreeAwarded, delayedGr
         .attr('fill', (d, i) => i % 2 === 0 ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.03)')
         .attr('rx', 2)
         .attr('ry', 2);
-          // 添加Y轴 (年份)
+    
+    // 添加Y轴 (年份)
     svg.append('g')
         .call(d3.axisLeft(y))
         .selectAll('text')
@@ -350,7 +402,7 @@ function createD3HorizontalBarChart(containerId, years, degreeAwarded, delayedGr
         .style('stroke', 'rgba(255, 255, 255, 0.1)');
         
     // 添加授予学位数条形图
-    svg.selectAll('.awarded-bar')
+    const awardedBars = svg.selectAll('.awarded-bar')
         .data(delayRates)
         .enter()
         .append('rect')
@@ -364,7 +416,7 @@ function createD3HorizontalBarChart(containerId, years, degreeAwarded, delayedGr
         .attr('ry', 3);
         
     // 添加延毕人数条形图
-    svg.selectAll('.delayed-bar')
+    const delayedBars = svg.selectAll('.delayed-bar')
         .data(delayRates)
         .enter()
         .append('rect')
@@ -376,7 +428,8 @@ function createD3HorizontalBarChart(containerId, years, degreeAwarded, delayedGr
         .attr('fill', 'rgba(231, 76, 60, 0.8)')
         .attr('rx', 2)
         .attr('ry', 2);
-          // 添加标题
+    
+    // 添加标题
     svg.append('text')
         .attr('x', width / 2)
         .attr('y', -20)
@@ -443,21 +496,20 @@ function createD3HorizontalBarChart(containerId, years, degreeAwarded, delayedGr
         .style('fill', '#e0e0e0');
         
     // 添加动画效果 - 授予学位数条
-    svg.selectAll('.awarded-bar')
-        .transition()
+    awardedBars.transition()
         .duration(800)
         .delay((d, i) => i * 50)
         .attr('width', d => x(d.awarded));
-          // 添加动画效果 - 延毕人数条
-    svg.selectAll('.delayed-bar')
-        .transition()
+          
+    // 添加动画效果 - 延毕人数条
+    delayedBars.transition()
         .duration(800)
         .delay((d, i) => i * 50 + 400)
         .attr('width', d => x(d.delayed))
         .on('end', function(d, i) {
             // 最后一个动画结束后添加数值标签
             if (i === delayRates.length - 1) {
-            // 添加比率标签
+                // 添加比率标签
                 svg.selectAll('.rate-label')
                     .data(delayRates)
                     .enter()
@@ -477,55 +529,39 @@ function createD3HorizontalBarChart(containerId, years, degreeAwarded, delayedGr
                     .transition()
                     .duration(500)
                     .style('opacity', 1);
-                    
-                // 为最高和最低延毕率添加特殊标记
-                svg.selectAll('.rate-indicator')
-                    .data(delayRates.filter(d => d.isMax || d.isMin))
-                    .enter()
-                    .append('text')
-                    .attr('class', 'rate-indicator')
-                    .attr('x', d => x(d.awarded) + 120)
-                    .attr('y', d => y(d.year) + y.bandwidth() / 2 + 5)
-                    .text(d => d.isMax ? '⬆ 最高' : '⬇ 最低')
-                    .style('font-size', '12px')
-                    .style('fill', d => d.isMax ? '#ff6b6b' : '#4caf50')
-                    .style('font-weight', '600')
-                    .style('opacity', 0)
-                    .transition()
-                    .duration(800)
-                    .delay(600)
-                    .style('opacity', 1);
             }
         });
-          // 添加交互效果 - 授予学位条
-    svg.selectAll('.awarded-bar')
+        
+    // 添加交互效果 - 鼠标悬停在年份上
+    const yearGroups = svg.selectAll(`.background-stripe`)
+        .style('cursor', 'pointer')
         .on('mouseover', function(event, d) {
-            // 高亮当前条
-            d3.select(this)
+            const index = years.indexOf(d);
+            const data = delayRates[index];
+            
+            // 高亮当前年份条形图
+            awardedBars.filter(item => item.year === d)
                 .transition()
                 .duration(200)
-                .attr('fill', '#63c5da')
-                .attr('opacity', 1);
+                .style('filter', 'brightness(1.2)');
                 
-            // 同时高亮对应的延毕条
-            const yearIndex = delayRates.findIndex(item => item.year === d.year);
-            svg.selectAll('.delayed-bar')
-                .filter((_, i) => i === yearIndex)
+            delayedBars.filter(item => item.year === d)
                 .transition()
                 .duration(200)
-                .attr('fill', '#e74c3c')
-                .attr('opacity', 1);
+                .style('filter', 'brightness(1.2)');
                 
-            // 高亮对应的延毕率标签
-            svg.selectAll('.rate-label')
-                .filter((_, i) => i === yearIndex)
+            // 淡化其他年份
+            awardedBars.filter(item => item.year !== d)
                 .transition()
                 .duration(200)
-                .style('font-size', '14px')
-                .style('font-weight', '700')
-                .style('fill', '#FFC107');
+                .style('opacity', 0.5);
                 
-            // 显示详细信息提示
+            delayedBars.filter(item => item.year !== d)
+                .transition()
+                .duration(200)
+                .style('opacity', 0.5);
+                
+            // 创建提示框
             const tooltip = d3.select(`#${containerId}`)
                 .append('div')
                 .attr('class', 'tooltip')
@@ -533,108 +569,52 @@ function createD3HorizontalBarChart(containerId, years, degreeAwarded, delayedGr
                 .style('background-color', 'rgba(20, 20, 20, 0.9)')
                 .style('color', '#fff')
                 .style('padding', '10px 15px')
-                .style('border-radius', '4px')
+                .style('border-radius', '6px')
                 .style('font-size', '14px')
-                .style('box-shadow', '0 3px 15px rgba(0,0,0,0.4)')
-                .style('pointer-events', 'none')
-                .style('z-index', '1000');
+                .style('box-shadow', '0 2px 10px rgba(0,0,0,0.5)')
+                .style('border-left', '4px solid #FFC107')
+                .style('z-index', '1000')
+                .style('pointer-events', 'none');
                 
-            // 计算提示框位置，避免触摸边界
+            // 计算提示框位置
             const containerRect = d3.select(`#${containerId}`).node().getBoundingClientRect();
-            const tooltipX = event.pageX - containerRect.left + 15;
-            const tooltipY = event.pageY - containerRect.top - 50;
+            const tooltipX = event.pageX - containerRect.left + 10;
+            const tooltipY = event.pageY - containerRect.top - 60;
             
-            // 计算同比变化（如果不是第一年）
-            let changeInfo = '';
-            if (yearIndex > 0) {
-                const prevData = delayRates[yearIndex - 1];
-                const awardedChange = d.awarded - prevData.awarded;
-                const awardedChangeRate = ((awardedChange / prevData.awarded) * 100).toFixed(1);
-                const delayedChange = d.delayed - prevData.delayed;
-                const delayedChangeRate = ((delayedChange / prevData.delayed) * 100).toFixed(1);
-                const rateChange = (d.rate - prevData.rate).toFixed(1);
-                
-                const awardedColor = awardedChange >= 0 ? '#4caf50' : '#f44336';
-                const delayedColor = delayedChange < 0 ? '#4caf50' : '#f44336';  // 延毕减少是好事
-                const rateColor = rateChange < 0 ? '#4caf50' : '#f44336';  // 延毕率降低是好事
-                
-                changeInfo = `
-                <div style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px;">
-                    <div style="font-size: 13px; margin-bottom: 5px;">较${prevData.year}变化：</div>
-                    <div>学位授予数: <span style="color:${awardedColor}; font-weight:600;">${awardedChange >= 0 ? '+' : ''}${d3.format(',')(awardedChange)} (${awardedChange >= 0 ? '+' : ''}${awardedChangeRate}%)</span></div>
-                    <div>延毕人数: <span style="color:${delayedColor}; font-weight:600;">${delayedChange >= 0 ? '+' : ''}${d3.format(',')(delayedChange)} (${delayedChange >= 0 ? '+' : ''}${delayedChangeRate}%)</span></div>
-                    <div>延毕率: <span style="color:${rateColor}; font-weight:600;">${rateChange >= 0 ? '+' : ''}${rateChange}%</span></div>
-                </div>`;
-            }
-                
+            // 设置提示框位置和内容
             tooltip
                 .style('left', `${tooltipX}px`)
                 .style('top', `${tooltipY}px`)
                 .html(`
                     <div style="border-bottom: 1px solid rgba(255,255,255,0.2); margin-bottom: 8px; padding-bottom: 5px;">
-                        <strong style="font-size: 16px;">${d.year}</strong>
+                        <strong style="font-size: 16px;">${d}</strong>
                     </div>
-                    <div>授予学位数: <strong>${d3.format(',')(d.awarded)}</strong>人</div>
-                    <div>延毕人数: <strong>${d3.format(',')(d.delayed)}</strong>人</div>
-                    <div style="margin-top: 8px; color: #FFC107;">延毕率: <strong>${d.rate}%</strong></div>
-                    ${changeInfo}
+                    <div>授予学位数: <strong>${d3.format(',')(data.awarded)}</strong> 人</div>
+                    <div>延毕人数: <strong>${d3.format(',')(data.delayed)}</strong> 人</div>
+                    <div style="margin-top: 5px;">延毕率: <strong style="color: ${
+                        data.isMax ? '#ff6b6b' : data.isMin ? '#4caf50' : '#FFC107'
+                    }">${data.rate}%</strong></div>
                 `);
         })
-        .on('mouseout', function() {
-            // 恢复原始样式
-            d3.select(this)
-                .transition()
+        .on('mouseout', function(event, d) {
+            // 恢复所有柱状图原样式
+            awardedBars.transition()
                 .duration(200)
-                .attr('fill', 'rgba(95, 140, 170, 0.8)')
-                .attr('opacity', 0.9);
+                .style('filter', 'none')
+                .style('opacity', 1);
                 
-            // 恢复对应的延毕条样式
-            svg.selectAll('.delayed-bar')
-                .transition()
+            delayedBars.transition()
                 .duration(200)
-                .attr('fill', 'rgba(231, 76, 60, 0.8)')
-                .attr('opacity', 0.9);
+                .style('filter', 'none')
+                .style('opacity', 1);
                 
-            // 恢复延毕率标签样式
-            svg.selectAll('.rate-label')
-                .transition()
-                .duration(200)
-                .style('font-size', '12px')
-                .style('font-weight', '400')
-                .style('fill', '#FFC107');
-                
-            // 移除提示
+            // 移除提示框
             d3.select(`#${containerId}`).selectAll('.tooltip').remove();
         });
-          // 添加交互效果 - 延毕人数条
-    svg.selectAll('.delayed-bar')
+        
+    // 添加交互效果 - 直接在柱子上也添加悬停效果
+    awardedBars.style('cursor', 'pointer')
         .on('mouseover', function(event, d) {
-            // 高亮当前条
-            d3.select(this)
-                .transition()
-                .duration(200)
-                .attr('fill', '#e74c3c')
-                .attr('opacity', 1);
-            
-            // 同时高亮对应的授予学位条
-            const yearIndex = delayRates.findIndex(item => item.year === d.year);
-            svg.selectAll('.awarded-bar')
-                .filter((_, i) => i === yearIndex)
-                .transition()
-                .duration(200)
-                .attr('fill', '#63c5da')
-                .attr('opacity', 0.7);
-                
-            // 高亮对应的延毕率标签
-            svg.selectAll('.rate-label')
-                .filter((_, i) => i === yearIndex)
-                .transition()
-                .duration(200)
-                .style('font-size', '14px')
-                .style('font-weight', '700')
-                .style('fill', '#FFC107');
-                
-            // 显示详细信息提示
             const tooltip = d3.select(`#${containerId}`)
                 .append('div')
                 .attr('class', 'tooltip')
@@ -642,39 +622,19 @@ function createD3HorizontalBarChart(containerId, years, degreeAwarded, delayedGr
                 .style('background-color', 'rgba(20, 20, 20, 0.9)')
                 .style('color', '#fff')
                 .style('padding', '10px 15px')
-                .style('border-radius', '4px')
+                .style('border-radius', '6px')
                 .style('font-size', '14px')
-                .style('box-shadow', '0 3px 15px rgba(0,0,0,0.4)')
-                .style('pointer-events', 'none')
-                .style('z-index', '1000');
+                .style('box-shadow', '0 2px 10px rgba(0,0,0,0.5)')
+                .style('border-left', '4px solid #5e9cd3')
+                .style('z-index', '1000')
+                .style('pointer-events', 'none');
                 
-            // 计算提示框位置，避免触摸边界
+            // 计算提示框位置
             const containerRect = d3.select(`#${containerId}`).node().getBoundingClientRect();
-            const tooltipX = event.pageX - containerRect.left + 15;
-            const tooltipY = event.pageY - containerRect.top - 50;
-                
-            // 计算占比信息
-            const delayPercentage = ((d.delayed / d.awarded) * 100).toFixed(1);
+            const tooltipX = event.pageX - containerRect.left + 10;
+            const tooltipY = event.pageY - containerRect.top - 60;
             
-            // 计算同比变化（如果不是第一年）
-            let changeInfo = '';
-            if (yearIndex > 0) {
-                const prevData = delayRates[yearIndex - 1];
-                const delayedChange = d.delayed - prevData.delayed;
-                const delayedChangeRate = ((delayedChange / prevData.delayed) * 100).toFixed(1);
-                const rateChange = (d.rate - prevData.rate).toFixed(1);
-                
-                const delayedColor = delayedChange < 0 ? '#4caf50' : '#f44336';  // 延毕减少是好事
-                const rateColor = rateChange < 0 ? '#4caf50' : '#f44336';  // 延毕率降低是好事
-                
-                changeInfo = `
-                <div style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px;">
-                    <div style="font-size: 13px; margin-bottom: 5px;">较${prevData.year}变化：</div>
-                    <div>延毕人数: <span style="color:${delayedColor}; font-weight:600;">${delayedChange >= 0 ? '+' : ''}${d3.format(',')(delayedChange)} (${delayedChange >= 0 ? '+' : ''}${delayedChangeRate}%)</span></div>
-                    <div>延毕率: <span style="color:${rateColor}; font-weight:600;">${rateChange >= 0 ? '+' : ''}${rateChange}%</span></div>
-                </div>`;
-            }
-                
+            // 设置提示框位置和内容
             tooltip
                 .style('left', `${tooltipX}px`)
                 .style('top', `${tooltipY}px`)
@@ -682,36 +642,75 @@ function createD3HorizontalBarChart(containerId, years, degreeAwarded, delayedGr
                     <div style="border-bottom: 1px solid rgba(255,255,255,0.2); margin-bottom: 8px; padding-bottom: 5px;">
                         <strong style="font-size: 16px;">${d.year}</strong>
                     </div>
-                    <div>延毕人数: <strong>${d3.format(',')(d.delayed)}</strong>人</div>
-                    <div>占授予学位总数: <strong>${delayPercentage}%</strong></div>
-                    <div style="margin-top: 8px; color: #FFC107;">延毕率: <strong>${d.rate}%</strong></div>
-                    ${changeInfo}
+                    <div>授予学位数: <strong>${d3.format(',')(d.awarded)}</strong> 人</div>
                 `);
-        })
-        .on('mouseout', function() {
-            // 恢复原始样式
+                
+            // 高亮当前柱子
             d3.select(this)
                 .transition()
                 .duration(200)
-                .attr('fill', 'rgba(231, 76, 60, 0.8)')
-                .attr('opacity', 0.9);
-                
-            // 恢复对应的授予学位条样式
-            svg.selectAll('.awarded-bar')
+                .style('filter', 'brightness(1.2)');
+        })
+        .on('mouseout', function() {
+            // 恢复原样式
+            d3.select(this)
                 .transition()
                 .duration(200)
-                .attr('fill', 'rgba(95, 140, 170, 0.8)')
-                .attr('opacity', 0.9);
+                .style('filter', 'none');
                 
-            // 恢复延毕率标签样式
-            svg.selectAll('.rate-label')
+            // 移除提示框
+            d3.select(`#${containerId}`).selectAll('.tooltip').remove();
+        });
+        
+    delayedBars.style('cursor', 'pointer')
+        .on('mouseover', function(event, d) {
+            const tooltip = d3.select(`#${containerId}`)
+                .append('div')
+                .attr('class', 'tooltip')
+                .style('position', 'absolute')
+                .style('background-color', 'rgba(20, 20, 20, 0.9)')
+                .style('color', '#fff')
+                .style('padding', '10px 15px')
+                .style('border-radius', '6px')
+                .style('font-size', '14px')
+                .style('box-shadow', '0 2px 10px rgba(0,0,0,0.5)')
+                .style('border-left', '4px solid #e74c3c')
+                .style('z-index', '1000')
+                .style('pointer-events', 'none');
+                
+            // 计算提示框位置
+            const containerRect = d3.select(`#${containerId}`).node().getBoundingClientRect();
+            const tooltipX = event.pageX - containerRect.left + 10;
+            const tooltipY = event.pageY - containerRect.top - 60;
+            
+            // 设置提示框位置和内容
+            tooltip
+                .style('left', `${tooltipX}px`)
+                .style('top', `${tooltipY}px`)
+                .html(`
+                    <div style="border-bottom: 1px solid rgba(255,255,255,0.2); margin-bottom: 8px; padding-bottom: 5px;">
+                        <strong style="font-size: 16px;">${d.year}</strong>
+                    </div>
+                    <div>延毕人数: <strong>${d3.format(',')(d.delayed)}</strong> 人</div>
+                    <div style="margin-top: 5px;">延毕率: <strong style="color: ${
+                        d.isMax ? '#ff6b6b' : d.isMin ? '#4caf50' : '#FFC107'
+                    }">${d.rate}%</strong></div>
+                `);
+                
+            // 高亮当前柱子
+            d3.select(this)
                 .transition()
                 .duration(200)
-                .style('font-size', '12px')
-                .style('font-weight', '400')
-                .style('fill', '#FFC107');
+                .style('filter', 'brightness(1.2)');
+        })
+        .on('mouseout', function() {
+            // 恢复原样式
+            d3.select(this)
+                .transition()
+                .duration(200)
+                .style('filter', 'none');
                 
-            // 移除提示
+            // 移除提示框
             d3.select(`#${containerId}`).selectAll('.tooltip').remove();
         });
 }

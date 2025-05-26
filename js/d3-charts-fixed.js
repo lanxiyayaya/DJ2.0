@@ -82,9 +82,8 @@ function createD3BarChart(containerId, years, values) {
     const colorScale = d3.scaleLinear()
         .domain([0, values.length - 1])
         .range(['#5e9cd3', '#1e5484']);
-    
-    // 添加柱状图
-    svg.selectAll('rect')
+      // 添加柱状图（创建一个变量来储存柱状图选择器，方便后续引用）
+    const bars = svg.selectAll('rect')
         .data(values)
         .enter()
         .append('rect')
@@ -117,11 +116,12 @@ function createD3BarChart(containerId, years, values) {
         .attr('y', -10)
         .attr('text-anchor', 'middle')
         .style('font-size', '16px')
-        .style('fill', '#e0e0e0');
+        .style('font-weight', 'bold')
+        .style('fill', '#e0e0e0')
+        .text('我国博士生招生人数（2004年至2022年）');
 
     // 添加动画效果
-    svg.selectAll('rect')
-        .transition()
+    bars.transition()
         .duration(800)
         .delay((d, i) => i * 100)
         .attr('y', d => y(d))
@@ -134,42 +134,37 @@ function createD3BarChart(containerId, years, values) {
                     .duration(500)
                     .style('opacity', 1);
             }
-        });
-    
-    // 添加交互效果 - 鼠标悬停
-    const barRects = svg.selectAll('rect');
-    barRects.on('mouseover', function(event, d, i) {
-        // 获取当前柱状图的索引
-        const thisRect = d3.select(this);
-        const rectData = thisRect.data()[0];
-        const index = values.findIndex(v => v === rectData);
+        });      // 添加交互效果 - 鼠标悬停
+    // 重新利用我们之前创建的bars变量
+        
+    // 添加悬停效果
+    bars.on('mouseover', function(event, d, i) {
+        // 使用直接的数据绑定获取索引，确保每个柱状图都能正确识别
+        const index = values.indexOf(d);  
         const year = years[index];
         
-        // 确定是否是特殊年份
-        const specialYears = ["2004年", "2021年", "2022年"];
-        const isSpecialYear = specialYears.includes(year);
-        
-        // 高亮当前柱状图，除了特殊年份不变色
-        thisRect
+        // 高亮当前柱状图（统一使用亮蓝色以确保一致性）
+        d3.select(this)
             .transition()
             .duration(200)
-            .attr('fill', isSpecialYear ? colorScale(index) : '#FFC107')
+            .attr('fill', '#4a9ff8')  // 统一使用亮蓝色
+            .style('filter', 'brightness(1.3)')  // 增加亮度效果
             .attr('opacity', 1);
         
         // 使其他柱状图变暗
-        barRects.filter(function() { return this !== event.currentTarget; })
+        bars.filter(function() { return this !== event.currentTarget; })
             .transition()
             .duration(200)
             .attr('opacity', 0.5);
         
-        // 显示对应的数值标签
+        // 高亮对应的数值标签
         svg.selectAll('.value-label')
             .filter((_, i) => i === index)
             .transition()
             .duration(200)
             .style('font-size', '14px')
             .style('font-weight', '700')
-            .style('fill', '#FFC107');
+            .style('fill', '#4a9ff8');  // 标签颜色与柱状图匹配
         
         // 创建和定位提示框
         const tooltip = d3.select(`#${containerId}`)
@@ -182,7 +177,7 @@ function createD3BarChart(containerId, years, values) {
             .style('border-radius', '6px')
             .style('font-size', '14px')
             .style('box-shadow', '0 2px 10px rgba(0,0,0,0.5)')
-            .style('border-left', '4px solid #FFC107')
+            .style('border-left', '4px solid #4a9ff8')  // 边框颜色与柱状图匹配
             .style('z-index', '1000')
             .style('pointer-events', 'none');
         
@@ -229,7 +224,8 @@ function createD3BarChart(containerId, years, values) {
             .transition()
             .duration(200)
             .attr('fill', (d, i) => colorScale(i))
-            .attr('opacity', 0.9);
+            .style('filter', 'brightness(1)')  // 恢复正常亮度
+            .attr('opacity', 1);  // 完全不透明
         
         // 恢复数值标签样式
         svg.selectAll('.value-label')

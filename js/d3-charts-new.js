@@ -28,7 +28,8 @@ function createD3BarChart(containerId, years, values) {
     const y = d3.scaleLinear()
         .domain([0, d3.max(values) * 1.1])
         .range([height, 0]);
-          // 添加X轴
+        
+    // 添加X轴
     svg.append('g')
         .attr('transform', `translate(0,${height})`)
         .call(d3.axisBottom(x))
@@ -80,21 +81,34 @@ function createD3BarChart(containerId, years, values) {
     // 定义颜色渐变
     const colorScale = d3.scaleLinear()
         .domain([0, values.length - 1])
-        .range(['#5e9cd3', '#1e5484']);      // 添加柱状图
-    svg.selectAll('rect')
+        .range(['#5e9cd3', '#1e5484']);
+    
+    // 添加标题
+    svg.append('text')
+        .attr('x', width / 2)
+        .attr('y', -10)
+        .attr('text-anchor', 'middle')
+        .style('font-size', '16px')
+        .style('font-weight', 'bold')
+        .style('fill', '#e0e0e0')
+        .text('我国博士生招生人数（2004年至2022年）');
+    
+    // 添加柱状图
+    const bars = svg.selectAll('.bar')
         .data(values)
         .enter()
         .append('rect')
+        .attr('class', 'bar')
         .attr('x', (d, i) => x(years[i]))
         .attr('y', height)  // 从底部开始动画
         .attr('width', x.bandwidth())
         .attr('height', 0)  // 初始高度为0
         .attr('fill', (d, i) => colorScale(i))
-        .attr('data-index', (d, i) => i)  // 设置data-index属性以便追踪索引
         .attr('rx', 3)  // 圆角
         .attr('ry', 3);
-      // 添加数值标签
-    svg.selectAll('.value-label')
+    
+    // 添加数值标签
+    const valueLabels = svg.selectAll('.value-label')
         .data(values)
         .enter()
         .append('text')
@@ -107,17 +121,9 @@ function createD3BarChart(containerId, years, values) {
         .style('fill', '#e0e0e0')
         .style('opacity', 0)  // 初始透明
         .text(d => d3.format(',')(d));
-          // 添加标题
-    svg.append('text')
-        .attr('x', width / 2)
-        .attr('y', -10)
-        .attr('text-anchor', 'middle')
-        .style('font-size', '16px')
-        .style('font-weight', 'bold')
-        .style('fill', '#e0e0e0')
-        .text('我国博士生招生人数（2004年至2022年）');    // 添加动画效果
-    svg.selectAll('rect')
-        .transition()
+    
+    // 添加动画效果
+    bars.transition()
         .duration(800)
         .delay((d, i) => i * 100)
         .attr('y', d => y(d))
@@ -125,57 +131,56 @@ function createD3BarChart(containerId, years, values) {
         .on('end', function(d, i) {
             // 柱状图动画完成后显示数值标签
             if (i === values.length - 1) {
-                svg.selectAll('.value-label')
-                    .transition()
+                valueLabels.transition()
                     .duration(500)
                     .style('opacity', 1);
             }
         });
-      // 添加交互效果 - 鼠标悬停
-    const barRects = svg.selectAll('rect');
-    barRects.on('mouseover', function(event, d) {
-        // 获取当前柱状图的索引和年份
-        const thisRect = d3.select(this);
-        const index = thisRect.attr('data-index');
+    
+    // 添加交互效果 - 鼠标悬停
+    bars.on('mouseover', function(event, d, i) {
+        // 获取当前柱状图的索引
+        const index = values.indexOf(d);
         const year = years[index];
         
-        // 统一的高亮效果：所有柱状图在悬停时都变亮
-        thisRect
+        // 高亮当前柱状图
+        d3.select(this)
             .transition()
             .duration(200)
-            .attr('fill', '#4a9ff8')  // 统一使用亮蓝色高亮
+            .attr('fill', '#4a9ff8')  // 使用亮蓝色高亮
             .attr('opacity', 1)
-            .attr('filter', 'brightness(1.3)'); // 提高亮度
-          // 使其他柱状图变暗
-        barRects.filter(function() { return this !== event.currentTarget; })
+            .style('filter', 'brightness(1.3)');  // 增加亮度
+        
+        // 其他柱状图变暗
+        bars.filter(function() { return this !== event.currentTarget; })
             .transition()
             .duration(200)
             .attr('opacity', 0.5);
         
-        // 显示对应的数值标签
-        svg.selectAll('.value-label')
-            .filter((_, i) => i == index)  // 使用== 而不是=== 来适应字符串和数字比较
+        // 高亮当前数值标签
+        valueLabels.filter((_, i) => i === index)
             .transition()
             .duration(200)
             .style('font-size', '14px')
             .style('font-weight', '700')
             .style('fill', '#ffffff');
-                
-            // 创建和定位提示框
-            const tooltip = d3.select(`#${containerId}`)
-                .append('div')
-                .attr('class', 'tooltip')
-                .style('position', 'absolute')
-                .style('background-color', 'rgba(20, 20, 20, 0.9)')
-                .style('color', '#fff')
-                .style('padding', '10px 15px')
-                .style('border-radius', '6px')
-                .style('font-size', '14px')
-                .style('box-shadow', '0 2px 10px rgba(0,0,0,0.5)')
-                .style('border-left', '4px solid #FFC107')
-                .style('z-index', '1000')
-                .style('pointer-events', 'none');
-                  // 计算提示框位置
+        
+        // 创建和定位提示框
+        const tooltip = d3.select(`#${containerId}`)
+            .append('div')
+            .attr('class', 'tooltip')
+            .style('position', 'absolute')
+            .style('background-color', 'rgba(20, 20, 20, 0.9)')
+            .style('color', '#fff')
+            .style('padding', '10px 15px')
+            .style('border-radius', '6px')
+            .style('font-size', '14px')
+            .style('box-shadow', '0 2px 10px rgba(0,0,0,0.5)')
+            .style('border-left', '4px solid #4a9ff8')
+            .style('z-index', '1000')
+            .style('pointer-events', 'none');
+        
+        // 计算提示框位置
         const containerRect = d3.select(`#${containerId}`).node().getBoundingClientRect();
         const tooltipX = event.pageX - containerRect.left + 10;
         const tooltipY = event.pageY - containerRect.top - 60;
@@ -184,14 +189,11 @@ function createD3BarChart(containerId, years, values) {
         const isRecentYear = index > years.length - 4;
         const adjustedX = isRecentYear ? tooltipX - 200 : tooltipX;
         
-        // 获取当前值
-        const value = values[index];
-        
         // 计算增长率（对于非第一年）
         let growthInfo = '';
         if (index > 0) {
             const prevValue = values[index - 1];
-            const growth = value - prevValue;
+            const growth = d - prevValue;
             const growthRate = ((growth / prevValue) * 100).toFixed(1);
             const growthColor = growth >= 0 ? '#4caf50' : '#f44336';
             growthInfo = `
@@ -201,38 +203,38 @@ function createD3BarChart(containerId, years, values) {
                         ${growth >= 0 ? '+' : ''}${d3.format(',')(growth)} (${growth >= 0 ? '+' : ''}${growthRate}%)
                     </strong>
                 </div>`;
-            }
-              // 设置提示框位置和内容
-            tooltip
-                .style('left', `${adjustedX}px`)
-                .style('top', `${tooltipY}px`)
-                .html(`
-                    <div style="border-bottom: 1px solid rgba(255,255,255,0.2); margin-bottom: 8px; padding-bottom: 5px;">
-                        <strong style="font-size: 16px;">${year}</strong>
-                    </div>
-                    <div>招生人数: <strong>${d3.format(',')(value)}</strong> 人</div>
-                    ${growthInfo}
-                `);
-        })        .on('mouseout', function() {
-            // 恢复所有柱状图原样式
-            svg.selectAll('rect')
-                .transition()
-                .duration(200)
-                .attr('fill', (d, i) => colorScale(i))
-                .attr('opacity', 0.9)
-                .attr('filter', 'none');  // 移除亮度滤镜
-            
-            // 恢复数值标签样式
-            svg.selectAll('.value-label')
-                .transition()
-                .duration(200)
-                .style('font-size', '12px')
-                .style('font-weight', '400')
-                .style('fill', '#e0e0e0');
-                
-            // 移除提示框
-            d3.select(`#${containerId}`).selectAll('.tooltip').remove();
-        });
+        }
+        
+        // 设置提示框位置和内容
+        tooltip
+            .style('left', `${adjustedX}px`)
+            .style('top', `${tooltipY}px`)
+            .html(`
+                <div style="border-bottom: 1px solid rgba(255,255,255,0.2); margin-bottom: 8px; padding-bottom: 5px;">
+                    <strong style="font-size: 16px;">${year}</strong>
+                </div>
+                <div>招生人数: <strong>${d3.format(',')(d)}</strong> 人</div>
+                ${growthInfo}
+            `);
+    })
+    .on('mouseout', function() {
+        // 恢复所有柱状图原样式
+        bars.transition()
+            .duration(200)
+            .attr('fill', (d, i) => colorScale(values.indexOf(d)))
+            .attr('opacity', 0.9)
+            .style('filter', 'none');  // 移除亮度滤镜
+        
+        // 恢复数值标签样式
+        valueLabels.transition()
+            .duration(200)
+            .style('font-size', '12px')
+            .style('font-weight', '400')
+            .style('fill', '#e0e0e0');
+        
+        // 移除提示框
+        d3.select(`#${containerId}`).selectAll('.tooltip').remove();
+    });
 }
 
 // 创建博士生延毕数据横向条形图
