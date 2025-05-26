@@ -1,15 +1,13 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head>    <meta charset="UTF-8">    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>博士生的"延"不由衷 | 数据新闻</title>    <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/title-page.css">
     <link rel="stylesheet" href="../css/integrated-page.css">
-    <link rel="stylesheet" href="../css/d3-charts.css">    <!-- 引入 Scrollama -->
-    <script src="https://unpkg.com/intersection-observer@0.5.1/intersection-observer.js"></script>    <script src="https://unpkg.com/scrollama@3.0.1/build/scrollama.min.js"></script>    <!-- 引入D3.js用于数据可视化 -->
+    <link rel="stylesheet" href="../css/d3-charts.css">    <!-- 引入 Scrollama -->    <script src="https://unpkg.com/intersection-observer@0.5.1/intersection-observer.js"></script>    <script src="https://unpkg.com/scrollama@3.0.1/build/scrollama.min.js"></script>    <!-- 引入D3.js用于数据可视化 -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <!-- 引入自定义D3图表（全新修复版本，彻底解决了所有悬停效果问题） -->
-    <script src="../js/d3-charts-fixed-new.js" defer></script>
+    <!-- 引入D3图表（修复版本 - 解决了所有悬停效果问题） -->
+    <script src="../js/d3-charts.js" defer></script>
 </head>
 <body>
     <!-- 固定导航栏 -->
@@ -115,9 +113,10 @@
                 <p>郭梓铮 刘祎涵 管诗雨 郭中丹 贾舒然</p>
                 <p>&copy; 2023 - 数据新闻课程作品</p>
             </div>
-        </footer>
-    </div>    <!-- 脚本引用 -->
+        </footer>    </div>    <!-- 脚本引用 -->
+    <!-- 主JS文件 - 处理滚动和数据加载 -->
     <script src="../js/integrated-page-fixed.js"></script>
+    <!-- 图表绘制辅助函数 -->
     <script src="../js/visualizations/chart.js"></script>
 </body>
 </html>
