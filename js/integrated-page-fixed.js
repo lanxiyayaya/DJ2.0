@@ -217,8 +217,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     chartContainer.innerHTML = `<p>图表类型: ${section.data.chartType}</p>
                         <p>数据值: ${JSON.stringify(section.data.values)}</p>`;
                 }
-            } else if (section.data.type === 'd3Chart') {
-                // D3.js 图表
+            } else if (section.data.type === 'd3Chart') {                // D3.js 图表
                 viz.style.backgroundImage = '';
                 viz.style.backgroundColor = '#2a2a2a';
                 
@@ -234,12 +233,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 titleEl.textContent = section.title;
                 viz.appendChild(titleEl);
                 
-                console.log('创建D3图表:', section.data.chartType);
-                
-                // 根据图表类型创建不同的D3图表
+                console.log('创建D3图表:', section.data.chartType, section.data);
+                  // 根据图表类型创建不同的D3图表
                 try {
                     if (section.data.chartType === 'barChart' && typeof createD3BarChart === 'function') {
                         createD3BarChart(chartContainer.id, section.data.years, section.data.values);
+                    } else if (section.data.chartType === 'yearlyBar' && typeof drawChart === 'function') {
+                        // 使用新添加的年度柱状图函数
+                        console.log("调用 drawChart 函数", chartContainer, section.data);
+                        drawChart(chartContainer, section.data, 'yearlyBar');
                     } else if (section.data.chartType === 'horizontalBarChart' && typeof createD3HorizontalBarChart === 'function') {
                         createD3HorizontalBarChart(chartContainer.id, section.data.years, 
                             section.data.degreeAwarded, section.data.delayedGraduation);
